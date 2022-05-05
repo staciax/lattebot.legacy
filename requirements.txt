@@ -1,0 +1,14 @@
+asyncpg==0.25.0
+colorthief==0.2.1
+discord.py @ git+https://github.com/Rapptz/discord.py.git@master#egg=discord.py[voice,speed]
+discord-ext-menus @ git+https://github.com/Rapptz/discord-ext-menus
+jishaku @ git+https://github.com/Gorialis/jishaku@master
+googletrans==3.1.0a0
+requests==2.27.1
+pygit2==1.9.1
+python-dotenv==0.20.0
+Wavelink==1.2.5
+pillow==9.1.0
+discord-together==1.2.4
+psutil==5.9.0
+cryptography==37.0.2

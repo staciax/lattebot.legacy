@@ -1,0 +1,306 @@
+
+
+{   
+    "anime": {
+        "waifu": {
+            "names": {
+                "en-US": "waifu",
+                "th": "waifu"
+            },
+            "descriptions": {
+                "en-US": "Waifu pictures",
+                "th": "แสดงภาพอนิเมะ"
+            },
+            "views": {
+                "image_url": {
+                    "en-US": "Image URL",
+                    "th": "ลิงค์รูปภาพ"
+                },
+                "API_SITE": {
+                    "en-US": "API Site",
+                    "th": "เว็บไซต์ API"
+                },
+                "Source URL":{
+                    "en-US": "Source URL",
+                    "th": "รูปภาพต้นทาง"
+                }
+            },
+            "describe" : {
+                "tags": {
+                    "en-US": "Pick tags",
+                    "th": "เลือกแทค"
+                }
+            },
+            "sub-commands": {
+                "sfw": {
+                    "names": {
+                        "en-US": "sfw",
+                        "th": "sfw"
+                    },
+                    "descriptions": {
+                        "en-US": "Display waifu sfw.",
+                        "th": "แสดงภาพอนิเมะ"
+                    }
+                },
+                "nsfw": {
+                    "names": {
+                        "en-US": "nsfw",
+                        "th": "nsfw"
+                    },
+                    "descriptions": {
+                        "en-US": "Display waifu nsfw.",
+                        "th": "แสดงภาพอนิเมะ 18 +"
+                    },
+                    "autocomplete": {
+                        "en-US": "The optional will not be displayed if it is not an NSFW channel.",
+                        "th": "ตัวเลือกจะไม่แสดงถ้าหากไม่ใช่แชแนล NSFW."
+                    }
+                }
+            }
+        }
+        
+    },
+    "fun": {
+        "latte_say": {
+            "names": {
+                "en-US": "latte_say",
+                "th": "latte_say"
+            },
+            "descriptions": {
+                "en-US": "Message something you give latte to say.",
+                "th": "ส่งข้อความถึงสิ่งที่คุณให้ลาเต้พูด"
+            },
+            "describe" : {
+                "message": {
+                    "en-US": "Input message",
+                    "th": "ใส่ข้อความ"
+                },
+                "attachment": {
+                    "en-US": "Input attachment",
+                    "th": "ไฟล์แนบ"
+                }
+            }
+        },
+        "saybot": {
+            "names": {
+                "en-US": "saybot",
+                "th": "saybot"
+            },
+            "descriptions": {
+                "en-US": "Your message to saybot",
+                "th": "ส่งข้อความของคุณเป็นบอท"
+            },
+            "describe" : {
+                "message": {
+                    "en-US": "Input message",
+                    "th": "ใส่ข้อความ"
+                },
+                "attachment": {
+                    "en-US": "Input attachment",
+                    "th": "ไฟล์แนบ"
+                },
+                "member": {
+                    "en-US": "Enter the member to send the message.",
+                    "th": "ใส่คนที่จะส่งข้อความ"
+                }
+            }
+        }
+    },
+    "help": {
+        "help": {
+            "names": {
+                "en-US": "help",
+                "th": "help"
+            },
+            "descriptions": {
+                "en-US": "Help",
+                "th": "เมนูช่วยเหลือ"
+            },
+            "describe":{
+                "category": {
+                    "en-US": "Choose a category to get more informations about it.",
+                    "th": "เลือกหมวดหมู่เพื่อดูข้อมูลเพิ่มเติม"
+                }
+            },
+            "errors": {
+                "category_not_found": {
+                    "en-US": "Category not found.",
+                    "th": "ไม่พบหมวดหมู่"
+                }
+            },
+            "buttons":{
+                "back": {
+                    "en-US": "Back",
+                    "th": "กลับ"
+                },
+                "next": {
+                    "en-US": "Next",
+                    "th": "ถัดไป"
+                },
+                "home": {
+                    "en-US": "Home",
+                    "th": "หน้าหลัก"
+                }
+            },
+            "selects": {
+                "category": {
+                    "en-US": "Select a category:",
+                    "th": "เลือกหมวดหมู่:"
+                },
+                "main": {
+                    "en-US": "Main Page",
+                    "th": "หน้าหลัก"
+                }
+            },
+            "embed": {
+                "descriptions": {
+                    "en-US": "Use **Selection** for more informations about a category.\nTotal commands: {commands}",
+                    "th": "ใช้ **Selection** เพื่อดูข้อมูลเพิ่มเติมเกี่ยวกับหมวดหมู่\nจำนวนคำสั่งทั้งหมด: {commands}"
+                }
+            }
+        }
+    },
+    "infomation": {
+        "avatar": {
+            "names": {
+                "en-US": "Avatar",
+                "th": "Avatar"
+            },
+            "descriptions": {
+                "en-US": "Avatar",
+                "th": "Avatar"
+            }
+        },
+        "banner": {
+            "names": {
+                "en-US": "Banner",
+                "th": "Banner"
+            },
+            "descriptions": {
+                "en-US": "Banner",
+                "th": "Banner"
+            }
+        },
+        "server": {
+            "names": {
+                "en-US": "Server",
+                "th": "Server"
+            },
+            "descriptions": {
+                "en-US": "Server",
+                "th": "Server"
+            }
+        },
+        "first_message": {
+            "names": {
+                "en-US": "First Message",
+                "th": "ข้อความแรก"
+            },
+            "descriptions": {
+                "en-US": "First Message",
+                "th": "ข้อความแรก"
+            }
+        }
+    },
+    "misc": {
+        "ping": {
+            "names": {
+                "en-US": "Ping",
+                "th": "Ping"
+            },
+            "descriptions": {
+                "en-US": "Ping",
+                "th": "Ping"
+            }
+        },
+        "invite": {
+            "names": {
+                "en-US": "Invite",
+                "th": "เชิญ"
+            },
+            "descriptions": {
+                "en-US": "Invite",
+                "th": "เชิญ"
+            }
+        },
+        "about": {
+            "names": {
+                "en-US": "About",
+                "th": "เกี่ยวกับ"
+            },
+            "descriptions": {
+                "en-US": "About",
+                "th": "เกี่ยวกับ"
+            }
+        },
+        "support": {
+            "names": {
+                "en-US": "Support",
+                "th": "สนับสนุน"
+            },
+            "descriptions": {
+                "en-US": "Support",
+                "th": "สนับสนุน"
+            }
+        },
+        "report": {
+            "names": {
+                "en-US": "Report",
+                "th": "รายงาน"
+            },
+            "descriptions": {
+                "en-US": "Report",
+                "th": "รายงาน"
+            }
+        }
+    },
+    "mod": {
+        "clear": {
+            "names": {
+                "en-US": "Clear",
+                "th": "ล้าง"
+            },
+            "descriptions": {
+                "en-US": "Clear",
+                "th": "ล้าง"
+            }
+        }
+    },
+    "music": {
+        "play": {},
+        "queue": {},
+        "loop": {},
+        "skip": {},
+        "pause": {},
+        "resume": {},
+        "shuffle": {},
+        "volume": {},
+        "leave": {}
+    },
+    "utility": {
+        "activity": {},
+        "afk": {},
+        "screenshot": {},
+        "sleep_timer": {},
+        "sleep_cancel": {},
+        "translate": {}
+    },
+    "valorant": {
+        "login": {},
+        "logout": {},
+        "store": {},
+        "battlepass": {},
+        "poinst": {},
+        "mission": {},
+        "nightmarket": {},
+        "cookies": {},
+        "bundle": {},
+        "bundles": {},
+        "inventory": {},
+        "leaderboard": {},
+        "profile": {}
+    },
+    
+    "errors": {
+    }
+}
