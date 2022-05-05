@@ -140,4 +140,4 @@ if __name__ == '__main__':
                 return await interaction.followup.send(embed=embed, ephemeral=True)
             await interaction.response.send_message(embed=embed, ephemeral=True)
         
-    bot.run(os.getenv('DISCORD_TOKEN_TEST'))
+    bot.run(os.getenv('DISCORD_TOKEN'))

@@ -219,7 +219,7 @@ class Latte_Bot(commands.AutoShardedBot):
         }
         db = None
         try:
-            db = await asyncpg.create_pool(**localhost)
+            db = await asyncpg.create_pool(**credentials)
         except Exception as e:
             print(e)
             self.log.error(f"Failed to create database pool.")
