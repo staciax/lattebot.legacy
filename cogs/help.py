@@ -178,17 +178,17 @@ class HelpView(ViewAuthor):
             if isinstance(command, app_commands.Group):
                 commands_walk = sorted(command.walk_commands(), key=lambda c: c.name)
                 for sub in commands_walk:
-                    signature = f'`/{name} {sub.qualified_name}`'
+                    signature = f'`/{sub.qualified_name}`'
                     # embed.description += f'\n<:bot_commands:904565707981852723> **{signature}** - `{sub.description}`'
                     embed.description += f'\n{signature} - {sub.description.lower()}'
 
                     if len(embed.description.splitlines()) == 8:
                         embeds.append(embed)
-                        embed = self.default_embed(cog, len(commands))
+                        embed = self.default_embed(cog)
             
             if len(embed.description.splitlines()) == 8:
                 embeds.append(embed)
-                embed = self.default_embed(cog, len(commands))
+                embed = self.default_embed(cog)
             # if len(embed.fields) == 5:
             #     embeds.append(embed)
             #     embed = self.default_embed(cog, len(commands))

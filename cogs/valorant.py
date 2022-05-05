@@ -253,8 +253,9 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     async def remove_guild(self, guild: discord.Guild):
         await self.db.delete_guild(guild.id)
 
-    def authenticate(self, username: str, password: str) -> VALORANT_ENDPOINT:
+    def authenticate(self, username: str, password: str, locale_code: str) -> VALORANT_ENDPOINT:
         auth = Auth()
+        auth.locale_code = locale_code
         data = auth.authenticate(username, password)
         return data
 
@@ -288,7 +289,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         row = await self.db.is_login(user_id, True)
         is_update = True if row else False
 
-        auth = self.authenticate(username, password)
+        auth = self.authenticate(username, password, interaction.locale)
 
         if auth['auth'] == 'response':
             await interaction.response.defer(ephemeral=True)
@@ -358,7 +359,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         endpoint = await self.get_endpoint(interaction.user.id, interaction.locale, username, password)
         
         offer = endpoint.store_fetch_storefront()
-        embeds = Generate_Embed.store(endpoint.player, offer, language)
+        embeds = Generate_Embed.store(endpoint.player, offer, language, response)
 
         await interaction.followup.send(embeds=embeds, view=share_button(interaction, embeds) if is_private_message else MISSING)
         
@@ -600,7 +601,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         await interaction.response.defer(ephemeral=True)
 
         if reload_type == 'Skin Price':
-            endpoint = await self.get_endpoint(interaction.user.id)
+            endpoint = await self.get_endpoint(interaction.user.id, interaction.locale)
             price = endpoint.store_fetch_offers()
             fetch_price(price)
         elif reload_type == 'Cache':

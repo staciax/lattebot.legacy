@@ -23,7 +23,7 @@ class Generate_Embed:
         return embed
 
     @classmethod
-    def store(cls, player: str, offer: Dict, language: str) -> List[discord.Embed]:
+    def store(cls, player: str, offer: Dict, language: str, response: Dict) -> List[discord.Embed]:
         
         data = GetFormat.offer_format(offer, language)
 
@@ -31,8 +31,12 @@ class Generate_Embed:
 
         # file = generate_image(data)
 
+        store_esponse = response.get('RESPONSE')
+
         duration = data['duration']
-        embed = Embed(f"Daily store for **{player}** | Remaining {format_relative(datetime.utcnow() + timedelta(seconds=duration))}")
+        description = store_esponse.format(username=player, duration=format_relative(datetime.utcnow() + timedelta(seconds=duration)))
+        
+        embed = Embed(description)
         embeds = [embed]
         [embeds.append(cls.__giorgio_embed(data[skin])) for skin in data if not skin == 'duration']
         

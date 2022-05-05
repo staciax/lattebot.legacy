@@ -36,8 +36,18 @@ class Auth:
     def __init__(self) -> None:
         self.user_agent = 'RiotClient/43.0.1.4195386.4190634 rso-auth (Windows;10;;Professional, x64)'
 
+        self.locale_code = 'en-US' # default language
+        self.response = {} # prepare response for local response
+
+    def local_response(self) -> LocaleErrorResponse:
+        '''This function is used to check if the local response is enabled.'''
+        self.response = LocaleErrorResponse('AUTH', self.locale_code)
+        return self.response
+
     def authenticate(self, username:str, password: str) -> Dict:
 
+        # language
+        local_response = self.local_response()
         session = requests.session()
 
         # prepare cookies for auth request    
@@ -76,19 +86,24 @@ class Auth:
             
         elif r.json()['type'] == 'multifactor':
             if r.status_code == 429:
-                raise RuntimeError(f'Please wait a few minutes and try again.')
-            
-            WaitFor2FA = {"auth": "2fa", "cookie": cookies}
+                raise RuntimeError(local_response.get('RATELIMIT'))
+
+            label_modal = local_response.get('INPUT_2FA_CODE')
+            WaitFor2FA = {"auth": "2fa", "cookie": cookies, 'label': label_modal}
+
             if r.json()['multifactor']['method'] == 'email':
-                WaitFor2FA['message'] = f"Riot sent a code to {r.json()['multifactor']['email']}"
+                WaitFor2FA['message'] = f"{local_response.get('2FA_TO_EMAIL')} {r.json()['multifactor']['email']}"
                 return WaitFor2FA
             
-            WaitFor2FA['message'] = 'You have 2FA enabled!'
+            WaitFor2FA['message'] = local_response.get('2FA_ENABLE')
             return WaitFor2FA
         
-        raise RuntimeError('Your username or password may be incorrect!')
+        raise RuntimeError(local_response.get('INVALID_PASSWORD'))
 
     def get_entitlements_token(self, access_token: str) -> str:
+
+        # language
+        local_response = self.local_response()
         
         session = requests.session()
         
@@ -102,11 +117,14 @@ class Auth:
         try:
             entitlements_token = r.json()['entitlements_token']
         except KeyError:
-            raise RuntimeError(f'Cookies is expired, plz `/login` again!')
+            raise RuntimeError(local_response.get('COOKIES_EXPIRED'))
         else:
             return entitlements_token
 
     def get_userinfo(self, access_token: str) -> str:
+
+        # language
+        local_response = self.local_response()
         session = requests.session()
                 
         headers = {
@@ -122,11 +140,15 @@ class Auth:
             name = r.json()['acct']['game_name']
             tag = r.json()['acct']['tag_line']
         except KeyError:
-            raise RuntimeError("This user hasn't created a name or tagline yet.")
+            raise RuntimeError(local_response.get('NO_NAME_TAG'))
         else:
             return puuid, name, tag
 
     def get_region(self, access_token: str, token_id: str) -> str:
+        
+        # language
+        local_response = self.local_response()
+
         session = requests.session()
         
         headers = {
@@ -143,13 +165,16 @@ class Auth:
             region = r.json()['affinities']['live']
 
         except KeyError:
-            raise RuntimeError(f'An unknown error occurred, plz `/login` again')
+            raise RuntimeError(local_response.get('REGION_NOT_FOUND'))
         else:
             return region 
 
     def give2facode(self, twoFAcode: str, cookies: Dict) -> Dict:
         session = requests.session()
         
+        # language
+        local_response = self.local_response()
+
         # LOAD COOKIE
         # cookies = json.loads(cookies)
         
@@ -171,9 +196,12 @@ class Auth:
             
             return {'auth': 'response', 'data': {'cookie': cookies, 'access_token': access_token, 'token_id': token_id}}
         
-        return {'auth': 'failed', 'error': '2FA code invalid'}
+        return {'auth': 'failed', 'error': local_response.get('2FA_INVALID_CODE')}
 
     def redeem_cookies(self, cookies: Dict, locale_code: str = 'en-US') -> Tuple[Dict, str, str]:
+
+        # language
+        local_response = self.local_response()
         
         # # LOAD COOKIE
         cookies = json.loads(cookies)
@@ -184,6 +212,9 @@ class Auth:
             cookies=cookies['cookie'],
             allow_redirects=False
         )
+
+        if r.status_code != 303:
+            raise RuntimeError(local_response.get('COOKIES_EXPIRED'))
 
         session.close()
 
@@ -197,6 +228,7 @@ class Auth:
         return cookies, accessToken, entitlements_token, tokenId
 
     def login_with_cookie(self, cookies: Dict, locale_code: str) -> Dict:
+        
         session = requests.session()
         headers = {
             'cookie': cookies
@@ -243,4 +275,4 @@ class Auth:
         elif authenticate['auth'] == '2fa':
             return {'error': authenticate['message']}
         
-        raise RuntimeError('`/store` without login not supported 2FA')
+        raise RuntimeError('Not supported 2FA')

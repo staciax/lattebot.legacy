@@ -188,6 +188,7 @@ class TwoFA_UI(ui.Modal, title='Two-factor authentication'):
         self.update: bool = update
         self.response = response
         self.two2fa.placeholder = auth['message']
+        self.two2fa.label = auth['label']
     
     two2fa = ui.TextInput(
         label='Input 2FA Code',
@@ -203,6 +204,7 @@ class TwoFA_UI(ui.Modal, title='Two-factor authentication'):
             cookie = self.cookie
             user_id = self.interaction.user.id
             auth = Auth()
+            auth.locale_code = self.interaction.locale
 
             async def send_embed(content: str) -> Awaitable[None]:
                 embed = discord.Embed(description = content, color=0xfd4554)

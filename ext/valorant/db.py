@@ -1,8 +1,5 @@
 import asyncpg
 import json
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
 from discord import Interaction
 from typing import Optional, Dict, List, Tuple
@@ -49,6 +46,7 @@ class ValorantDB:
 
         db = self.db
         auth = self.auth
+        auth.locale_code = locale_code
 
         auth_data = data['data']
         cookies = json.dumps(auth_data['cookie'])
@@ -107,6 +105,8 @@ class ValorantDB:
     async def refresh_token(self, user_id: int, cookies: Dict, locale_code: str) -> Optional[Dict]:
         
         auth = self.auth
+        auth.locale_code = locale_code
+        
         db = self.db
 
         new_cookie, access_token, entitlements_token, tokenId = auth.redeem_cookies(cookies, locale_code)
