@@ -180,7 +180,7 @@ class Notify_list(ui.View):
 class TwoFA_UI(ui.Modal, title='Two-factor authentication'):
     '''Modal for riot login with 2 factor authentication'''
     
-    def __init__(self, interaction: Interaction, db:asyncpg.Pool, auth: Dict, update:bool, response: Dict) -> None:
+    def __init__(self, interaction: Interaction, db: asyncpg.Pool, auth: Dict, update:bool, response: Dict) -> None:
         super().__init__(timeout=60)
         self.interaction = interaction
         self.db = db
@@ -219,7 +219,8 @@ class TwoFA_UI(ui.Modal, title='Two-factor authentication'):
 
             if auth['auth'] == 'response':
                 
-                login = await self.db.login(user_id, auth, interaction.guild_id, self.update)
+
+                login = await self.db.login(user_id, auth, interaction.guild_id, interaction.locale, self.update)
                 if login['auth']:
                     return await send_embed(f"{self.response.get('SUCCESS')} **{login['player']}!**")
                 
@@ -648,11 +649,11 @@ class WeasponView(ui.View):
 
     @ui.button(label='Back', style=discord.ButtonStyle.blurple)
     async def back_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.show_page(interaction, self.current_page - 1)
+        await self.show_page(interaction, - 1)
     
     @ui.button(label='Next', style=discord.ButtonStyle.blurple)
     async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.show_page(interaction, self.current_page + 1)
+        await self.show_page(interaction, +1)
 
     @ui.button(label='≫', style=discord.ButtonStyle.blurple)
     async def last_page(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -682,13 +683,17 @@ class WeasponView(ui.View):
         await self.interaction.response.send_message(embeds=embeds, view=self, ephemeral=True)
 
 class InventoryView(ui.View):
-    def __init__(self, interaction: Interaction, player_loadout: dict, endpoint: Any, raw_loadout: dict) -> None:
+    def __init__(self, interaction: Interaction, player_loadout: dict, endpoint: Any, raw_loadout: dict, language: str) -> None:
         self.interaction = interaction
         self.loadout = player_loadout
         self.endpoint = endpoint
         self.raw_loadout = raw_loadout
+        self.language = language
         self.sprays_page = []
         self.skin_page = []
+        from itertools import cycle
+        card_type = ['wide','large', 'small']
+        self.card_type_cycle = cycle(card_type)
         super().__init__()
 
     # @ui.button(label='Player Card')
@@ -738,33 +743,178 @@ class InventoryView(ui.View):
     # @ui.button(label='Sprays')
     # async def sprays_button(self, interaction:Interaction, button: ui.Button):
     #     ...
-    
-    @ui.button(label='Currently skins', style=ButtonStyle.primary)
+
+    # @ui.button(label='Active', style=ButtonStyle.gray, disabled=True)
+    # async def active_button(self, interaction:Interaction, button: ui.Button):
+    #     ...
+
+    # spray_inventory = endpoint.store_fetch_entitlements('d5f120f8-ff8c-4aac-92ea-f2b5acbe9475')
+    # buddies_inventory = endpoint.store_fetch_entitlements('dd3bf334-87f3-40bd-b043-682a57a8dc3a')
+    # card_inventory = endpoint.store_fetch_entitlements('3f296c07-64c3-494c-923b-fe692a4fa1bd')
+    # skins_inventory = endpoint.store_fetch_entitlements('e7c63390-eda7-46e0-bb7a-a6abdacd2433')
+    # chromas_inventory = endpoint.store_fetch_entitlements('3ad1b2b2-acdb-4524-852f-954a76ddae0a')
+    # titles_inventory = endpoint.store_fetch_entitlements('de7caa6b-adf7-4588-bbd1-143831e786c6')
+    # agent_inventory = endpoint.store_fetch_entitlements('01bb38e1-da47-4e6a-9b3d-945fe4655707')
+    # contract_inventory = endpoint.store_fetch_entitlements('f85cb6f7-33e5-4dc8-b609-ec7212301948')
+
+    # @ui.select(placeholder='select a inventory', row=1, options=[
+    #     discord.SelectOption(label='Skins'),
+    #     discord.SelectOption(label='Sprays'),
+    #     discord.SelectOption(label='Buddies'),
+    #     discord.SelectOption(label='Cards'),
+    #     # discord.SelectOption(label='chromas'),
+    #     discord.SelectOption(label='Titles'),
+    # ])
+    # async def inventory_select(self, interaction:Interaction, select: ui.Select):
+    #     if select.values[0] == 'Skins':
+    #         data = self.endpoint.store_fetch_entitlements('e7c63390-eda7-46e0-bb7a-a6abdacd2433')
+
+    #         import json
+    #         print(json.dumps(data, indent=4, ensure_ascii=False))
+    #         # skins = []
+    #         # for skin in data['Entitlements']:
+    #         #     item = GetItem.get_skin(skin['ItemID'])
+    #         #     skins.append(item)
+
+    #         # print(skins)
+    #         # await interaction.response.send_message(skins)
+
+    #     elif select.values[0] == 'Sprays':
+    #         data = self.endpoint.store_fetch_entitlements('d5f120f8-ff8c-4aac-92ea-f2b5acbe9475')
+
+    #         for spray in data['Entitlements']:
+    #             item = GetItem.get_spray(spray['ItemID'])
+
+    #     elif select.values[0] == 'Buddies':
+    #         data = self.endpoint.store_fetch_entitlements('dd3bf334-87f3-40bd-b043-682a57a8dc3a')
+
+    #         for buddy in data['Entitlements']:
+    #             item = GetItem.get_buddie(buddy['ItemID'])
+
+    #     elif select.values[0] == 'Cards':
+    #         data = self.endpoint.store_fetch_entitlements('3f296c07-64c3-494c-923b-fe692a4fa1bd')
+
+    #         for card in data['Entitlements']:
+    #             item = GetItem.get_playercard(card['ItemID'])
+
+    #     elif select.values[0] == 'chromas':
+    #         data = self.endpoint.store_fetch_entitlements('3ad1b2b2-acdb-4524-852f-954a76ddae0a')
+    #     elif select.values[0] == 'Titles':
+    #         data = self.endpoint.store_fetch_entitlements('de7caa6b-adf7-4588-bbd1-143831e786c6')
+            
+    #         for title in data['Entitlements']:
+    #             item = GetItem.get_title(title['ItemID'])
+
+    @ui.button(emoji='🔫', style=ButtonStyle.primary)
     async def weapon_button(self, interaction:Interaction, button: ui.Button):
+        self.build_page()
         embeds_list = self.skin_page
         view = WeasponView(interaction, embeds_list, self)
         await view.start()
+
+    @ui.button(emoji='<:spray:971941939190595667>', style=ButtonStyle.primary)
+    async def sprays_active(self, interaction:Interaction, button: ui.Button):
+        loadout = self.loadout
+        embeds = []
+
+        for spray in sorted(loadout['sprays'], key=lambda c: c['slot']):
+            embed = discord.Embed(description=f"**{spray['slot']}. {spray['name']}**", color=discord.Color.blurple())
+            embed.set_thumbnail(url=spray['icon'])
+            embeds.append(embed)
+        
+        await interaction.response.send_message(embeds=embeds, ephemeral=True)
+
+    @ui.button(label='⟳', style=ButtonStyle.primary)
+    async def switch_card(self, interaction:Interaction, button: ui.Button):
+        embed = self.main_page()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    # @ui.button(label='Inventory', style=ButtonStyle.gray, disabled=True, row=1)
+    # async def inventory_button(self, interaction:Interaction, button: ui.Button):
+    #     ...
+
+    # skins_inventory = endpoint.store_fetch_entitlements('e7c63390-eda7-46e0-bb7a-a6abdacd2433')
+    # spray_inventory = endpoint.store_fetch_entitlements('3f296c07-64c3-494c-923b-fe692a4fa1bd')
+    # buddies_inventory = endpoint.store_fetch_entitlements('dd3bf334-87f3-40bd-b043-682a57a8dc3a')
+    # card_inventory = endpoint.store_fetch_entitlements('3f296c07-64c3-494c-923b-fe692a4fa1bd')
+    # chromas_inventory = endpoint.store_fetch_entitlements('3ad1b2b2-acdb-4524-852f-954a76ddae0a')
+    # titles_inventory = endpoint.store_fetch_entitlements('de7caa6b-adf7-4588-bbd1-143831e786c6')
+
+    # @ui.button(emoji='🔫', style=ButtonStyle.primary, row=1)
+    # async def skins_inventory(self, interaction:Interaction, button: ui.Button):
+    #     ...
+    
+    # @ui.button(emoji='<:spray:971941939190595667>', style=ButtonStyle.primary, row=1)
+    # async def spray_inventory(self, interaction:Interaction, button: ui.Button):
+    #     ...
+    
+    # @ui.button(emoji='<:buddies:971945838949593108>', style=ButtonStyle.primary, row=1)
+    # async def buddies_inventory(self, interaction:Interaction, button: ui.Button):
+    #     ...
+    
+    # @ui.button(emoji='<:card:971944987996590111>', style=ButtonStyle.primary, row=1)
+    # async def card_inventory(self, interaction:Interaction, button: ui.Button):
+    #     ...
+    
+    # @ui.button(emoji='<:title:971946769518850108>', style=ButtonStyle.primary, row=1)
+    # async def titles_inventory(self, interaction:Interaction, button: ui.Button):
+    #     ...
+
+    # @ui.button(label='Chromas Inventory', emoji='🔫', style=ButtonStyle.primary, row=1)
+    # async def chromas_inventory(self, interaction:Interaction, button: ui.Button):
+    #     ...
 
     def build_page(self):
         loadout = self.loadout
         skin_list = []
         
-        for skin in loadout['weapons']:
+        def sort_type(skin):
+            if skin['type'] == 'malee':
+                return -1
+            elif skin['type'] == 'sidearms':
+                return 0
+            elif skin['type'] == 'smgs':
+                return 1
+            elif skin['type'] == 'shotgun':
+                return 2
+            elif skin['type'] == 'rifles':
+                return 3
+            elif skin['type'] == 'sniper':
+                return 4
+            return 5
+
+        def populate_weapon(skin):
+            if skin['weapon'] == 'Melee':
+                return -1
+            elif skin['weapon'] == 'Vandal':
+                return 0
+            elif skin['weapon'] == 'Phantom':
+                return 1
+            elif skin['weapon'] == 'Operator':
+                return 2
+            elif skin['weapon'] == 'Sheriff':
+                return 3
+            elif skin['weapon'] == 'Spectre':
+                return 4
+            return sort_type(skin) + 5    
+
+        for skin in sorted(loadout['weapons'], key=populate_weapon):
 
             name = skin['name']
             icon = skin['icon']
             weapon = skin['weapon']
             emoji = skin['emoji']
             color = skin['color']
+            weapon_type = skin['type']
     
             embed = discord.Embed(color=color)
 
             embed.description = f'{emoji} **{name}**'
             embed.set_thumbnail(url=icon)
-            # embed.set_footer(text=weapon)
+            embed.set_footer(text=weapon)
             
             skin_list.append(embed)
-            if len(skin_list) == 7:
+            if len(skin_list) == 6:
                 self.skin_page.append(skin_list)
                 skin_list = []
         
@@ -772,16 +922,16 @@ class InventoryView(ui.View):
             self.skin_page.append(skin_list)
         
     def main_page(self):
-        icon = self.loadout['playercard']['icon']['wide']
+        from utils.utils import get_dominant_color
+        icon = self.loadout['playercard']['icon'][next(self.card_type_cycle)]
+        title = self.loadout['playertitle']['names'][self.language]
 
-        embed = discord.Embed(
-            title='Valorant Inventory',
-            color=discord.Color.blurple()
-        )
+        embed = discord.Embed(title=title, color=get_dominant_color(icon))
+        embed.set_author(name=self.endpoint.player)
         embed.set_image(url=icon)
+
         return embed
 
     async def start(self):
-        self.build_page()
         embed = self.main_page()
         await self.interaction.followup.send(embed=embed, view=self)

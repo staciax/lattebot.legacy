@@ -154,3 +154,4 @@ cython_debug/
 #.idea/
 
 ext/valorant/data/
+desktop.ini

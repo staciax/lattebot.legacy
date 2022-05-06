@@ -537,8 +537,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         response = LocaleResponse(interaction.command.name, interaction.locale)
 
         # endpoint
-        # endpoint = await self.get_endpoint(interaction.user.id)
-        endpoint = await self.get_endpoint(self.bot.owner_id)
+        endpoint = await self.get_endpoint(self.bot.owner_id, interaction.locale)
 
         # data
         bundle_entries = endpoint.store_fetch_storefront()
@@ -565,7 +564,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         if r.status != 200: raise RuntimeError(f'Error to fetch leaderboard')
         
         data = await r.json()
-        entries = GetFormat.leaderboard_format(data)
+        entries = GetFormat.leaderboard(data)
 
         p = LeaderboardPages(entries=entries, interaction=interaction)
         p.embed.title = f"{region.upper()} Leaderboard"
@@ -574,12 +573,11 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @valorant.command(name='info')
     @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
     async def _info(self, interaction: Interaction) -> None:
+        """Shows your account info"""
 
         # language
         language = InteractionLanguage(interaction.locale)
         response = LocaleResponse(interaction.command.name, interaction.locale)
-
-        """Shows your account info"""
 
         raise RuntimeError('Not available at the moment')
         # ingame status name notify_stutus
@@ -615,140 +613,50 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     async def _clear_db(self, interaction: Interaction, clear_type: Literal['Users', 'Notify']) -> None:
         """Clear database"""
 
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
 
         if clear_type == 'Users':
             await self.bot.db.execute('DELETE FROM valorant.users;')
         elif clear_type == 'Notify':
             await self.bot.db.execute('DELETE FROM valorant.notifys;')
         
-        await interaction.followup.send(embed=Embed(f'Successfully cleared {clear_type} form database'))
+        await interaction.followup.send(embed=Embed(f'Successfully cleared database `valorant.{clear_type.lower()}`'))
 
     @valorant.command()
     @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
     async def inventory(self, interaction: Interaction) -> None:
         """Shows your inventory"""
-        # raise RuntimeError('Not available at the moment')
-    
+
         # # language
         language = InteractionLanguage(interaction.locale)
         response = LocaleResponse(interaction.command.name, interaction.locale)
 
         await interaction.response.defer()
 
-        endpoint = await self.get_endpoint(interaction.user.id)
-
-        '''
-        `ITEMTYPEID:`
-        '01bb38e1-da47-4e6a-9b3d-945fe4655707': 'Agents'\n
-        'f85cb6f7-33e5-4dc8-b609-ec7212301948': 'Contracts',\n
-        'd5f120f8-ff8c-4aac-92ea-f2b5acbe9475': 'Sprays',\n
-        'dd3bf334-87f3-40bd-b043-682a57a8dc3a': 'Gun Buddies',\n
-        '3f296c07-64c3-494c-923b-fe692a4fa1bd': 'Player Cards',\n
-        'e7c63390-eda7-46e0-bb7a-a6abdacd2433': 'Skins',\n
-        '3ad1b2b2-acdb-4524-852f-954a76ddae0a': 'Skins chroma',\n
-        'de7caa6b-adf7-4588-bbd1-143831e786c6': 'Player titles',\n
-        '''
-
-        spray_inventory = endpoint.store_fetch_entitlements('3f296c07-64c3-494c-923b-fe692a4fa1bd')
-        buddies_inventory = endpoint.store_fetch_entitlements('dd3bf334-87f3-40bd-b043-682a57a8dc3a')
-        card_inventory = endpoint.store_fetch_entitlements('3f296c07-64c3-494c-923b-fe692a4fa1bd')
-        skins_inventory = endpoint.store_fetch_entitlements('e7c63390-eda7-46e0-bb7a-a6abdacd2433')
-        # chromas_inventory = endpoint.store_fetch_entitlements('3ad1b2b2-acdb-4524-852f-954a76ddae0a')
-        # titles_inventory = endpoint.store_fetch_entitlements('de7caa6b-adf7-4588-bbd1-143831e786c6')
-
-        # print('spray_inventory', spray_inventory)
-        # print('buddies_inventory', buddies_inventory)
-        # print('card_inventory', card_inventory)
-        # print('skins_inventory', skins_inventory)
-        # print('chromas_inventory', chromas_inventory)
-        # print('titles_inventory', titles_inventory)
+        endpoint = await self.get_endpoint(interaction.user.id, interaction.locale)
 
         data = endpoint.fetch_player_loadout()
-
-        weapon_ids = {
-            "29a0cfab-485b-f5d5-779a-b59f85e204a8": {"type": "sidearms", "name": "Classic"},
-            "42da8ccc-40d5-affc-beec-15aa47b42eda": {"type": "sidearms", "name": "Shorty"},
-            "44d4e95c-4157-0037-81b2-17841bf2e8e3": {"type": "sidearms", "name": "Frenzy"},
-            "1baa85b4-4c70-1284-64bb-6481dfc3bb4e": {"type": "sidearms", "name": "Ghost"},
-            "e336c6b8-418d-9340-d77f-7a9e4cfe0702": {"type": "sidearms", "name": "Sheriff"},
-            "f7e1b454-4ad4-1063-ec0a-159e56b58941": {"type": "smgs", "name": "Stinger"},
-            "462080d1-4035-2937-7c09-27aa2a5c27a7": {"type": "smgs", "name": "Spectre"},
-            "ae3de142-4d85-2547-dd26-4e90bed35cf7": {"type": "rifles", "name": "Bulldog"},
-            "4ade7faa-4cf1-8376-95ef-39884480959b": {"type": "rifles", "name": "Guardian"},
-            "ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a": {"type": "rifles", "name": "Phantom"},
-            "9c82e19d-4575-0200-1a81-3eacf00cf872": {"type": "rifles", "name": "Vandal"},
-            "c4883e50-4494-202c-3ec3-6b8a9284f00b": {"type": "sniper", "name": "Marshal"},
-            "a03b24d3-4319-996d-0f8c-94bbfba1dfc7": {"type": "sniper", "name": "Operator"},
-            "55d8a0f4-4274-ca67-fe2c-06ab45efdf58": {"type": "machine", "name": "Ares"},
-            "63e6c2b6-4a8e-869c-3d4c-e38355226584": {"type": "machine", "name": "Odin"},
-            "ec845bf4-4f79-ddda-a3da-0db3774b2794": {"type": "shotgun", "name": "Judge"},
-            "910be174-449b-c412-ab22-d0873436b21b": {"type": "shotgun", "name": "Bucky"},
-            "2f59173c-4bed-b6c3-2191-dea9b58be9c7": {"type": "malee", "name": "Melee"},
-        }
-
-        spray_slot = {
-            '0814b2fe-4512-60a4-5288-1fbdcec6ca48' : 1,
-            '04af080a-4071-487b-61c0-5b9c0cfaac74' : 2,
-            '5863985e-43ac-b05d-cb2d-139e72970014' : 3,
-        }
-
-        def get_skin(gun_id: str, uuid: str, SkinLevelID: str) -> Tuple[str, str, str]:
-            from ext.valorant.resources import tiers as TIERS
-
-            skin = GetItem.get_skin_chromas(uuid)
-            weapon = weapon_ids[gun_id]['name']
-            name = skin['names'][language]
-            icon = skin['icon']
-            if 'Level' in name: name = name.split('Level')[0]
-            if '(Variant' in name: name = name.split('(Variant')[0]
-            if icon is None or name == weapon: icon = skin['full_render']
-            
-            color, emoji = 0x0F1923, ''
-
-            skin = GetItem.get_skin_lvl_or_name(name, SkinLevelID, language)
-            try:
-                tier = skin['tier']
-                tier_color = TIERS[tier]['color']
-                emoji = TIERS[tier]['emoji']
-                color = tier_color
-            except (KeyError, TypeError):
-                pass
-
-            return weapon, name, icon, color, emoji 
-
-        def get_spray_source(uuid: str, slot_id: str) -> Tuple[str, str, int]:
-            spray = GetItem.get_spray(uuid)
-            name = spray['names'][language]
-            icon = spray['icon']
-            slot = spray_slot[slot_id]
-            return name, icon, slot
-
-        loadout = {'weapons': [], 'sprays': [], 'playercard': {}, 'playertitle': {}}
-
-        for gun in data['Guns']:
-            weapon, name, icon, color, emoji = get_skin(gun['ID'], gun['ChromaID'], gun['SkinLevelID'])
-            loadout['weapons'].append({
-                'weapon': weapon,
-                'name': name,
-                'icon': icon,
-                'color': color,
-                'emoji': emoji,
-            })
+        loadout = GetFormat.inventory(data)
         
-        for spray in data['Sprays']:
-            name, icon, slot = get_spray_source(spray['SprayID'], spray['EquipSlotID'])
-            loadout['sprays'].append({'name': name, 'icon': icon, 'slot': slot})
-        
-        loadout['playercard'] = GetItem.get_playercard(data['Identity']['PlayerCardID'])
-        loadout['playertitle'] = GetItem.get_title(data['Identity']['PlayerTitleID'])
-
-        # for skin in skins_inventory["Entitlements"]:
-        #     print(get_skin_name(skin['ItemID']))
-        #     print(skin['ItemID'])
-
-        view = InventoryView(interaction, loadout, endpoint, data)
+        view = InventoryView(interaction, loadout, endpoint, data, language)
         await view.start()
+
+    @app_commands.command()
+    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @only_latte_guild()
+    async def dodge(self, interaction: Interaction) -> None:
+        """Valorant: Dodge a match"""
+
+        await interaction.response.defer(ephemeral=True)
+
+        # language
+        language = InteractionLanguage(interaction.locale)
+        response = LocaleResponse(interaction.command.name, interaction.locale)
+
+        endpoint = await self.get_endpoint(interaction.user.id)
+        endpoint.pregame_quit_match()
+
+        await interaction.followup.send('Dogged!', ephemeral=True)
         
     # @valorant.command()
     # async def rank(self, interaction: Interaction) -> None:
@@ -823,23 +731,6 @@ class ValorantCommands(commands.Cog, name='Valorant'):
                 
     #     await interaction.response.send_message('testing', view=PartyView(interaction))
     
-    @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
-    @only_latte_guild()
-    async def dodge(self, interaction: Interaction) -> None:
-        """Valorant: Dodge a match"""
-
-        await interaction.response.defer(ephemeral=True)
-
-        # language
-        language = InteractionLanguage(interaction.locale)
-        response = LocaleResponse(interaction.command.name, interaction.locale)
-
-        endpoint = await self.get_endpoint(interaction.user.id)
-        endpoint.pregame_quit_match()
-
-        await interaction.followup.send('Dogged!', ephemeral=True)
-
     # @valorant.command()
     # # @only_latte_guild()
     # @app_commands.choices(agents=[app_commands.Choice(name=name, value=name) for name, uuid in AgentID.items()])

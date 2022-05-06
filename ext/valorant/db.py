@@ -39,7 +39,7 @@ class ValorantDB:
         else:
             raise RuntimeError("you're not registered!, plz `/login` to register!")
 
-    async def login(self, user_id: int, data: dict, guild_id:int, locale_code: str, update:bool=False) -> Optional[Dict]:
+    async def login(self, user_id: int, data: dict, guild_id:int, locale_code: str, update: bool=False) -> Optional[Dict]:
 
         # language
         response = LocaleErrorResponse('DATABASE', locale_code)
@@ -66,16 +66,17 @@ class ValorantDB:
         e_headers = self.encrypt(headers, self.key)
         e_cookies = self.encrypt(cookies, self.key)
 
-        query = """INSERT INTO valorant.users(
+        query_insert = """INSERT INTO valorant.users(
                 user_id, guild_id, puuid, player_name, region, expiry_token, headers, cookies, notify_mode)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
                 """
 
-        if update:
-            query = """UPDATE valorant.users
+        query_update = """UPDATE valorant.users
             SET guild_id=$2, puuid=$3, player_name=$4, region=$5, expiry_token=$6, headers=$7, cookies=$8, notify_mode=$9
             WHERE user_id = $1;
             """
+        
+        query = query_insert if not update else query_update
 
         async with db.acquire():
             try:

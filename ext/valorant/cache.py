@@ -25,15 +25,16 @@ def fetch_skin() -> None:
     resp = session.get(f'https://valorant-api.com/v1/weapons/skins?language=all')
     if resp.status_code == 200:
         json = {}
-        # json['version'] = get_valorant_version()
         for skin in resp.json()['data']:
-            skinone = skin['levels'][0]
-            json[skinone['uuid']] = {
-                'uuid': skinone['uuid'],
-                'names': skin['displayName'],
-                'icon': skinone['displayIcon'],
-                'tier': skin['contentTierUuid'],
-            }
+            for skins in skin['levels']:
+                json[skins['uuid']] = {
+                    'uuid': skins['uuid'],
+                    'names': skins['displayName'],
+                    'base_names': skin['displayName'],
+                    'icon': skins['displayIcon'],
+                    'tier': skin['contentTierUuid'],
+                    'video': skins['streamedVideo'],
+                }
         data['skins'] = json
         JSON.save('cache', data)
     session.close()

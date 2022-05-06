@@ -25,7 +25,7 @@ class Generate_Embed:
     @classmethod
     def store(cls, player: str, offer: Dict, language: str, response: Dict) -> List[discord.Embed]:
         
-        data = GetFormat.offer_format(offer, language)
+        data = GetFormat.offer(offer, language)
 
         # from .pillow import generate_image
 
@@ -53,7 +53,7 @@ class Generate_Embed:
         title_Refills = response.get('REFILLS')
         title_daily_reset = response.get('DAILY_RESET')
 
-        data = GetFormat.mission_format(mission, language)
+        data = GetFormat.mission(mission, language)
 
         daily_format = data['daily']
         daily_end = data['daily_end']
@@ -164,7 +164,7 @@ class Generate_Embed:
         MSG_RESPONSE = response.get('RESPONSE')
         MSG_TIER = response.get('TIER')
 
-        BTP = GetFormat.battlepass_format(data, season, language)
+        BTP = GetFormat.battlepass(data, season, language)
 
         item = BTP['data']
         reward = item['reward']
@@ -208,7 +208,7 @@ class Generate_Embed:
         
         message_response = response.get('RESPONSE')
 
-        night_mk = GetFormat.nightmarket_format(offer, language, response)
+        night_mk = GetFormat.nightmarket(offer, language, response)
         
         skins = night_mk['nightmarket']
         duration = night_mk['duration']

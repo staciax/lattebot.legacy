@@ -286,9 +286,13 @@ class GetItem:
                 skin = [data["skins"][x] for x in data["skins"] if data["skins"][x]['names'][language] in name][0]
         return skin
 
+    def spray_slot(slot_id: str) -> int:
+        from .resources import spray_slots
+        return spray_slots[slot_id]
+
 class GetFormat:
 
-    def offer_format(data: Dict, language: str) -> Dict:
+    def offer(data: Dict, language: str) -> Dict:
         '''Get skins format'''
 
         offer_list = data["SkinsPanelLayout"]["SingleItemOffers"]
@@ -322,7 +326,7 @@ class GetFormat:
         }
         return skin_source
 
-    def nightmarket_format(offer: Dict, language: str, response: Dict) -> Dict:
+    def nightmarket(offer: Dict, language: str, response: Dict) -> Dict:
         '''Get Nightmarket format'''
         
         try:
@@ -358,7 +362,7 @@ class GetFormat:
         }
         return data
 
-    def mission_format(data: Dict, language:str) -> Dict[str, str]:
+    def mission(data: Dict, language:str) -> Dict[str, str]:
         '''Get mission format'''
 
         mission = data["Missions"]
@@ -404,7 +408,7 @@ class GetFormat:
         misson_data = dict(daily=daily, weekly=weekly, daily_end=daily_end, weekly_end=weekly_end, newplayer=newplayer)
         return misson_data
         
-    def leaderboard_format(data: Dict) -> List[str]:
+    def leaderboard(data: Dict) -> List[str]:
         from .resources import ranks
 
         entries = []
@@ -428,7 +432,7 @@ class GetFormat:
         return entries
     
     @classmethod
-    def battlepass_format(cls, data: Dict, season: str, language: str) -> Dict:
+    def battlepass(cls, data: Dict, season: str, language: str) -> Dict:
         
         data = data['Contracts']
         contracts = JSON.read('contracts')
@@ -513,6 +517,65 @@ class GetFormat:
         current_reward = data[next_reward]
 
         return current_reward
+
+    def inventory(data: Dict) -> List[str]:
+        language = 'en-US'
+
+        from .resources import weapon_ids
+
+        loadout = {'weapons': [], 'sprays': [], 'playercard': {}, 'playertitle': {}}
+        
+        def loadout_format(weapon_id: str, uuid: str, SkinLevelID: str) -> Tuple[str, str, str]:
+            from ext.valorant.resources import tiers as TIERS
+
+            skin = GetItem.get_skin_chromas(uuid)
+            weapon = weapon_ids[weapon_id]['name']
+            weapon_type = weapon_ids[weapon_id]['type']
+            name = skin['names'][language]
+            icon = skin['icon']
+            if 'Level' in name: name = name.split('Level')[0]
+            if '(Variant' in name: name = name.split('(Variant')[0]
+            if icon is None or name == weapon: icon = skin['full_render']
+            
+            color, emoji = 0x0F1923, ''
+
+            skin = GetItem.get_skin_lvl_or_name(name, SkinLevelID, language)
+            try:
+                tier = skin['tier']
+                tier_color = TIERS[tier]['color']
+                emoji = TIERS[tier]['emoji']
+                color = tier_color
+            except (KeyError, TypeError):
+                pass
+
+            return weapon, name, icon, color, emoji, weapon_type
+
+        for weapon in data['Guns']:
+            weapon, name, icon, color, emoji, weapon_type = loadout_format(weapon['ID'], weapon['ChromaID'], weapon['SkinLevelID'])
+            loadout['weapons'].append({
+                'weapon': weapon,
+                'name': name,
+                'icon': icon,
+                'color': color,
+                'emoji': emoji,
+                'type': weapon_type
+            })
+        
+        for item in data['Sprays']:
+            spray = GetItem.get_spray(item['SprayID'])
+            name = spray['names'][language]
+            icon = spray['icon']
+            slot = GetItem.spray_slot(item['EquipSlotID'])
+            loadout['sprays'].append({'name': name, 'icon': icon, 'slot': slot})
+        
+        loadout['playercard'] = GetItem.get_playercard(data['Identity']['PlayerCardID'])
+        loadout['playertitle'] = GetItem.get_title(data['Identity']['PlayerTitleID'])
+
+        # for skin in skins_inventory["Entitlements"]:
+        #     print(get_skin_name(skin['ItemID']))
+        #     print(skin['ItemID'])
+
+        return loadout
 
 # USEFUL
 
