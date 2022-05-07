@@ -18,7 +18,7 @@ from discord_together import DiscordTogether
 # Local
 from utils import Latte_Bot
 from utils.context_managers import UserLock
-from utils.emojis import latte_emoji
+from utils.emojis import LATTE_EMOJI
 from utils.checks import cooldown_for_everyone_but_me
 
 activity_list = {
@@ -71,7 +71,8 @@ class Utility(commands.Cog):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(903339694098628618)
+        return str(LATTE_EMOJI.GIFT_BLUE)
+        # return self.bot.get_emoji(903339694098628618)
 
     @app_commands.command()
     @app_commands.choices(activity=[app_commands.Choice(name=name, value=value) for name, value in activity_list.items()])
@@ -92,7 +93,7 @@ class Utility(commands.Cog):
 
         url = await self.togetherControl.create_link(channel.id, activity, max_age=86400)
 
-        emoji = latte_emoji('youtube') if activity == 'youtube' else '🎮'
+        emoji = str(LATTE_EMOJI.YOUTUBE) if activity == 'youtube' else '🎮'
         label = 'Watch Together' if activity == 'youtube' else 'Play Together'
         
         view = ui.View()

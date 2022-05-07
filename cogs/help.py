@@ -16,13 +16,14 @@ from utils.useful import LatteEmbed
 from utils.view import ViewAuthor
 from utils.checks import cooldown_for_everyone_but_me
 from utils import Latte_Bot
+from utils.emojis import LATTE_EMOJI
 
 ignore_extensions = ['Owner', 'Jishaku', 'Events', 'Admin', 'Help', 'Testing', 'NotifySkin']
 
 class FrontPage(discord.Embed):
     def __init__(self, bot: Latte_Bot):
         self.bot = bot
-        emoji = bot.get_emoji
+        emoji = LATTE_EMOJI
         super().__init__()
         self.color = bot.theme
         self.set_author(name=f'{bot.user.display_name} - Help', icon_url=bot.user.avatar)
@@ -30,22 +31,22 @@ class FrontPage(discord.Embed):
             # + f"Total commands: `{len(bot.tree.get_commands())}`"
         self.add_field(
             name='\u200b',
-            value=f'•{emoji(840678426867793921)} Anime\n•{emoji(914142887854358588)} Misc',
+            value=f'•{emoji.RAIDEN} Anime\n•{emoji.MISC} Misc',
             inline=True
         )
         self.add_field(
             name='\u200b',
-            value=f'•🥳 Fun\n•{emoji(958861859161767987)} Music',
+            value=f'•🥳 Fun\n•{emoji.MIKU_MUSIC} Music',
             inline=True
         )
         self.add_field(
             name='\u200b',
-            value=f'•{emoji(909498501799505930)} Infomatic\n•{emoji(903339694098628618)} Utility',
+            value=f'•{emoji.LOVE_NOTE} Infomatic\n•{emoji.GIFT_BLUE} Utility',
             inline=True
         )
         self.add_field(
             name='• Ext',
-            value=f'•{emoji(955743009138429962)} Valorant',
+            value=f'•{emoji.VALORANT} Valorant',
             inline=True
         )
 
@@ -66,7 +67,7 @@ class HelpSelectMenu(ui.Select['HelpView']):
         self.add_option(
             label='Index',
             value='__index',
-            emoji=self.bot.get_emoji(902674566655139881)
+            emoji=str(LATTE_EMOJI.LATTE)
         )
         for cog, commands in sorted(self.commands.items(), key=lambda x: x[0].qualified_name):
             if not commands:
@@ -74,7 +75,7 @@ class HelpSelectMenu(ui.Select['HelpView']):
             description = cog.description.split('\n', 1)[0] or None
             emoji = getattr(cog, 'display_emoji', None)
             self.add_option(label=cog.qualified_name, value=cog.qualified_name, description=description, emoji=emoji)
-    
+
     async def callback(self, interaction: discord.Interaction):
         assert self.view is not None
         value = self.values[0]
@@ -206,13 +207,14 @@ class HelpView(ViewAuthor):
         self.first_page.disabled = page == 0
         self.last_page.disabled = page == total
 
-    async def on_timeout(self) -> None:
-        self.clear_items()
-        support_emoji = self.bot.get_emoji(941971854728511529)
-        latte_emoji = self.bot.get_emoji(907030425011109888)
-        self.add_item(ui.Button(label='ꜱᴜᴘᴘᴏʀᴛ ꜱᴇʀᴠᴇʀ', url=self.bot.latte_supprt_url, emoji=support_emoji))
-        self.add_item(ui.Button(label='ɪɴᴠɪᴛᴇ ᴍᴇ', url=self.bot.invite_url, emoji=latte_emoji))
-        await self.interaction.edit_original_message(view=self)
+    # async def on_timeout(self) -> None:
+    #     self.clear_items()
+    #     support_emoji = LATTE_EMOJI.LATTE_SUPPORT
+    #     latte_emoji = LATTE_EMOJI.LATTE_ICON
+        
+    #     self.add_item(ui.Button(label='ꜱᴜᴘᴘᴏʀᴛ ꜱᴇʀᴠᴇʀ', url=self.bot.latte_supprt_url, emoji=support_emoji))
+    #     self.add_item(ui.Button(label='ɪɴᴠɪᴛᴇ ᴍᴇ', url=self.bot.invite_url, emoji=latte_emoji))
+    #     await self.interaction.edit_original_message(view=self)
 
     async def start(self):
         self.add_item(HelpSelectMenu(self.data, self.bot))

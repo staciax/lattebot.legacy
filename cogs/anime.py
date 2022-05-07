@@ -7,6 +7,7 @@ from discord.app_commands import Choice
 from typing import List, Literal
 
 from utils import Latte_Bot
+from utils.emojis import LATTE_EMOJI
 from utils.anime_api import *
 from utils.checks import is_nsfw, cooldown_for_everyone_but_me
 
@@ -22,7 +23,8 @@ class Anime(commands.Cog):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(840678426867793921)
+        return str(LATTE_EMOJI.RAIDEN)
+        # return self.bot.get_emoji(840678426867793921)
 
     waifu = app_commands.Group(name='waifu', description='Waifu pictures')
 

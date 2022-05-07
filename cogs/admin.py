@@ -2,12 +2,11 @@ import discord
 import os
 from discord import app_commands, Interaction, Member, User
 from discord.ext import commands, menus
-from discord.ext.commands import Greedy
 from typing import Optional, Union, Dict, List
 
 from utils import Cog
 from utils.formats import format_dt
-from utils.emojis import latte_emoji 
+from utils.emojis import LATTE_EMOJI 
 from utils.checks import owner_only
 from utils.menus import LattePage, SimplePageSource
 
@@ -28,7 +27,8 @@ class Admin(Cog):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(840678426867793921)
+        return LATTE_EMOJI.MOLANG_COFFEE
+        # return self.bot.get_emoji(840678426867793921)
 
     # async def cog_check(self, ctx: LatteContext) -> bool:
     #     return await commands.is_owner().predicate(ctx) # type: ignore
@@ -102,7 +102,7 @@ class Admin(Cog):
             print(e)
             raise commands.UserInputError('The extension load failed')
         else:
-            embed = discord.Embed(description= f"{latte_emoji('greentick')} Load : `{extension}`", color = 0x8be28b)
+            embed = discord.Embed(description= f"{LATTE_EMOJI.GREENTICK} Load : `{extension}`", color = 0x8be28b)
             await interaction.response.send_message(embed=embed)
                    
     @app_commands.command()
@@ -120,7 +120,7 @@ class Admin(Cog):
             print(e)
             raise commands.UserInputError('The extension unload failed')
         else:
-            embed = discord.Embed(description= f"{latte_emoji('greentick')} Unload : `{extension}`", color = 0x8be28b)
+            embed = discord.Embed(description= f"{LATTE_EMOJI.GREENTICK} Unload : `{extension}`", color = 0x8be28b)
             await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name='reload')
@@ -141,7 +141,7 @@ class Admin(Cog):
             print(e)
             raise RuntimeError('The extension reload failed')
         else:
-            embed = discord.Embed(description= f"{latte_emoji('greentick')} Reload : `{extension}`", color = 0x8be28b)
+            embed = discord.Embed(description= f"{LATTE_EMOJI.GREENTICK} Reload : `{extension}`", color = 0x8be28b)
             await interaction.response.send_message(embed=embed)
         
     @load.autocomplete('extension')

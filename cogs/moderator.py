@@ -6,13 +6,15 @@ from typing import Literal
 
 from utils.checks import cooldown_for_everyone_but_me
 from utils import Cog
+from utils.emojis import LATTE_EMOJI
 
 class Mod(Cog):
     """Moderator commands"""
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(970838278318211133)
+        return str(LATTE_EMOJI.MOD)
+        # return self.bot.get_emoji(970838278318211133)
 
     @app_commands.command()
     @app_commands.describe(amount='The amount of messages to delete', type='Type of messages to delete')

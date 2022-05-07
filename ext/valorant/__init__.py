@@ -30,6 +30,7 @@ from .resources import (
     get_emoji_tier,
     AgentID
 )
+from .errors import PhaseError, ResponseError
 
 # __all__ = (
 #     "Auth",

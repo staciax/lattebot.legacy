@@ -17,7 +17,7 @@ from wavelink import LavalinkException, LoadTrackError
 
 from utils import Latte_Bot
 from utils.formats import deltaconv
-from utils.emojis import latte_emoji
+from utils.emojis import LATTE_EMOJI
 
 latte_guild_id = 840379510704046151
 default_guild = discord.Object(id=latte_guild_id)
@@ -128,7 +128,7 @@ class QueueView(ui.View):
         if len(total_queue) == 0:
             self.clear_items()
             if isinstance(track, wavelink.YouTubeTrack):
-                self.add_item(ui.Button(label='Listen on youtube', url=track.uri, emoji=latte_emoji('youtube')))
+                self.add_item(ui.Button(label='Listen on youtube', url=track.uri, emoji=str(LATTE_EMOJI.YOUTUBE)))
             # if isinstance(track, wavelink.PartialTrack):
             #     self.add_item(ui.Button(label='Music URL', emoji='🎵'))
                 
@@ -184,7 +184,8 @@ class Music(commands.Cog):
     
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(958861859161767987)
+        return str(LATTE_EMOJI.MIKU_MUSIC)
+        # return self.bot.get_emoji(958861859161767987)
 
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.play_ctx.name, type=self.play_ctx.type)

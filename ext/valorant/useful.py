@@ -477,19 +477,13 @@ class GetFormat:
     def __get_contracts_by_season_id(contracts: Dict, data_contracts: Dict, season_id: str, language: str) -> Dict:
         '''Get battlepass info'''
 
-        def get_contracts_uuid():
-            try:
-                data_contracts = JSON.read('contracts')
-                contracts_uuid = [x for x in data_contracts['contracts'] if data_contracts['contracts'][x]['reward']['relationUuid'] == season_id]
-            except KeyError:
-                from .cache import fetch_contracts
-                fetch_contracts()
-                return get_contracts_uuid()
-            
-            return contracts_uuid
-            
-        contracts_uuid = get_contracts_uuid()
-                
+        try:
+            contracts_uuid = [x for x in data_contracts['contracts'] if data_contracts['contracts'][x]['reward']['relationUuid'] == season_id]
+        except KeyError:
+            from .cache import fetch_contracts
+            fetch_contracts()
+            return GetFormat.__get_contracts_by_season_id(contracts, JSON.read('contracts'), season_id, language)
+        
         if len(contracts_uuid) == 0:
             return dict(success=False)
 
@@ -519,6 +513,7 @@ class GetFormat:
         return current_reward
 
     def inventory(data: Dict) -> List[str]:
+        
         language = 'en-US'
 
         from .resources import weapon_ids
@@ -540,6 +535,7 @@ class GetFormat:
             color, emoji = 0x0F1923, ''
 
             skin = GetItem.get_skin_lvl_or_name(name, SkinLevelID, language)
+            
             try:
                 tier = skin['tier']
                 tier_color = TIERS[tier]['color']

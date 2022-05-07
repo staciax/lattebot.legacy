@@ -1,3 +1,5 @@
+from enum import Enum
+
 # ----- BADGE CONVERTER ----- #
 
 def profile_converter(name: str) -> str:
@@ -23,6 +25,17 @@ def profile_converter(name: str) -> str:
   return names_to_emojis.get(name)
 
 
+# ----- STATUS INFO ----- #
+
+def status_converter(name: str) -> str:
+  names_to_status = {
+    "online" : "<:online:896657842298310686>",
+    "dnd" : "<:dnd:896657867246030888>",
+    "idle" : "<:idle:896657886111989761>",
+    "offline" : "<:offline:896657913291096074>",
+  }
+  return names_to_status.get(name)
+
 # ----- EMOJI CONVERTER ----- #
 
 def latte_emoji(name: str) -> str:
@@ -30,7 +43,7 @@ def latte_emoji(name: str) -> str:
     "member" : "<:member:904565339835232276>",
     "purplestar":"<a:purplestar:902673752976941066>",
     "purpleflower":"<:purpleflower:902672657881907260>",
-    "cursor":"<:cursor:896576387002032159>",
+    "cursor":"<a:cursor:896576387002032159>",
     "command":"<:bot_commands:902669882552881162>",
     "brownjump":"<a:brownjump:902686897439121428>",
     "greentick":"<:greentick:902669964174049343>",
@@ -39,7 +52,6 @@ def latte_emoji(name: str) -> str:
     "spotify":"<:Spotify:904418859937828874>",
     "latte_icon":"<:latte_icon_new:907030425011109888>",
     "mongo":"<:mongo:904509654086864917>",
-    "cursor":"<a:cursor:896576387002032159>",
     "python":"<:python:904565441761017907>",
     "bot_commands":"<:bot_commands:904565707981852723>",
     "dpy":"<:dpy:904565466633211925>",
@@ -51,13 +63,39 @@ def latte_emoji(name: str) -> str:
   }
   return names_to_emojis.get(name)
 
-# ----- STATUS INFO ----- #
+class LATTE_EMOJI(Enum):
+  MEMBER = "<:member:904565339835232276>"
+  PURPLESTAR = "<a:purplestar:902673752976941066>"
+  PURPLEFLOWER = "<:purpleflower:902672657881907260>"
+  CURSOR = "<a:cursor:896576387002032159>"
+  COMMAND = "<:bot_commands:902669882552881162>"
+  BROWNJUMP = "<a:brownjump:902686897439121428>"
+  GREENTICK = "<:greentick:902669964174049343>"
+  REDTICK = "<:redtick:902669996960919552>"
+  SLEEPING = "<a:sleeping:902960651272589363>"
+  SPOTIFY = "<:Spotify:904418859937828874>"
+  LATTE_ICON = "<:latte_icon_new:907030425011109888>"
+  MONGO = "<:mongo:904509654086864917>"
+  PYTHON = "<:python:904565441761017907>"
+  BOT_COMMANDS = "<:bot_commands:904565707981852723>"
+  DPY = "<:dpy:904565466633211925>"
+  POSTGRESQL = "<:postgresql:908211369743122443>"
+  PYCORD = '<:pycord_icon:948811595998453841>'
+  GAME = '<:game:966129467653259324>'
+  YOUTUBE = '<:youtube1:966131531926089789>'
+  LATTE_SUPPORT = '<:latte_support:941971854728511529>'
+  MOLANG_COFFEE = '<:Molang_coffee:840678426867793921>'
+  MISC = '<:misc:914142887854358588>'
+  MIKU_MUSIC = '<:MikuMusic:958861859161767987>'
+  LOVE_NOTE = '<:love_note:909498501799505930>'
+  GIFT_BLUE = '<:gift_blue:903339694098628618>'
+  VALORANT = '<:valorant_icon:955743009138429962>'
+  LATTE = '<:a_latte_verify:861800747293212672>'
+  MOD = '<:mod:970838278318211133>'
+  JISHAKU = '<:jishaku_logo:972345525129060362>'
+  STACIA = '<:stacia_icon:948850880617250837>'
+  MOON = '<:Moon:969409166215102464>'
+  RAIDEN = '<:chibiraidensmile:903361022943965215>'
 
-def status_converter(name: str) -> str:
-  names_to_status = {
-    "online" : "<:online:896657842298310686>",
-    "dnd" : "<:dnd:896657867246030888>",
-    "idle" : "<:idle:896657886111989761>",
-    "offline" : "<:offline:896657913291096074>",
-  }
-  return names_to_status.get(name)
+  def __str__(self):
+    return self.value

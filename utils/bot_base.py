@@ -118,6 +118,7 @@ class Latte_Bot(commands.AutoShardedBot):
             self.latte_support_view = True
 
         await self.tree.sync()
+        await self.tree.sync(guild=discord.Object(id=840379510704046151))
         await self.tree.sync(guild=discord.Object(id=965942839563386910))
 
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=self.latte_activity))

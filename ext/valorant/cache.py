@@ -27,14 +27,29 @@ def fetch_skin() -> None:
         json = {}
         for skin in resp.json()['data']:
             for skins in skin['levels']:
-                json[skins['uuid']] = {
+                uuid = skins['uuid']
+                json[uuid] = {
                     'uuid': skins['uuid'],
-                    'names': skins['displayName'],
-                    'base_names': skin['displayName'],
-                    'icon': skins['displayIcon'],
+                    'names': skins['displayName'] or skin['displayName'],
+                    'base_names': skin['displayName'] if skins['displayName'] != skin['displayName'] else None,
+                    'icon': skins['displayIcon'] or skin['displayIcon'],
                     'tier': skin['contentTierUuid'],
                     'video': skins['streamedVideo'],
+                    'swatch': None,
+                    'levelone': True if skin['levels'][0]['uuid'] == skins['uuid'] else False,
                 }
+            for chroma in skin['chromas']:
+                json[chroma['uuid']] = {
+                    'uuid': chroma['uuid'],
+                    'names': chroma['displayName'] or skin['displayName'],
+                    'base_names': skin['displayName'] if chroma['displayName']!= skin['displayName'] else None,
+                    'icon': chroma['displayIcon'] or skin['displayIcon'],                    
+                    'tier': skin['contentTierUuid'],
+                    'video': skins['streamedVideo'],
+                    'swatch': chroma['swatch'],
+                    'levelone': False
+                }
+
         data['skins'] = json
         JSON.save('cache', data)
     session.close()
@@ -357,7 +372,7 @@ def fetch_agent() -> None:
     session = requests.session()
 
     print('Fetching agents !')
-    #bc542d
+
     r = session.get(f'https://valorant-api.com/v1/agents?isPlayableCharacter=true&language=all')
     if r.status_code == 200:
         json = {}
@@ -409,7 +424,7 @@ def fetch_skinchromas() -> None:
     data = JSON.read('skinchromas')
     session = requests.session()
 
-    print('Fetching season !')
+    print('Fetching skinchromas !')
 
     resp = session.get('https://valorant-api.com/v1/weapons/skinchromas?language=all')
     if resp.status_code == 200:
@@ -445,7 +460,7 @@ def get_cache() -> None:
     fetch_currencies()
     # fetch_ranktiers(lang)
     fetch_spray()
-    fetch_season()
+    # fetch_season()
     fetch_playertitles()
     fetch_mission()
     fetch_playercard()

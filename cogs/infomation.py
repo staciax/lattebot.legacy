@@ -10,8 +10,8 @@ from utils import Cog
 from utils.view import AvatarView
 from utils.utils import Banner, get_dominant_color
 from utils.formats import deltaconv
-from utils.emojis import latte_emoji
 from utils.checks import cooldown_for_everyone_but_me
+from utils.emojis import LATTE_EMOJI
 
 deafult_guild = discord.Object(id=840379510704046151)
             
@@ -20,7 +20,8 @@ class Infomation(Cog):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(909498501799505930)
+        return str(LATTE_EMOJI.LOVE_NOTE)
+        # return self.bot.get_emoji(909498501799505930)
     
     @app_commands.command()
     @app_commands.describe(member='The member you want to get the avatar of.')

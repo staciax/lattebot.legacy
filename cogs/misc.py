@@ -11,7 +11,7 @@ from discord.utils import format_dt, utcnow
 from utils.checks import cooldown_for_everyone_but_me
 
 from utils import Cog
-from utils.emojis import latte_emoji
+from utils.emojis import LATTE_EMOJI
 
 default_guild = Object(id=840379510704046151)
 
@@ -34,7 +34,8 @@ class Misc(Cog):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(914142887854358588)
+        return str(LATTE_EMOJI.MISC)
+        # return self.bot.get_emoji(914142887854358588)
     
     @app_commands.command()
     @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
@@ -42,7 +43,7 @@ class Misc(Cog):
         """Show Bot latency."""
         latency = self.bot.latency * 1000
         embed = discord.Embed(color=self.bot.theme)
-        embed.add_field(name=f"{latte_emoji('cursor')} Latency", value=f"```nim\n{round(latency)} ms```")
+        embed.add_field(name=f"{LATTE_EMOJI.CURSOR} Latency", value=f"```nim\n{round(latency)} ms```")
         embed.set_footer(text=f'{self.bot.user.name} | v{self.bot.bot_version}')
         await interaction.response.send_message(embed=embed)
 
@@ -58,7 +59,7 @@ class Misc(Cog):
         # users_count = len(self.bot.users)
         users_count = sum(g.member_count for g in self.bot.guilds)
         support_url = self.bot.latte_supprt_url
-        invite_emoji = self.bot.get_emoji(966016885445492757)
+        invite_emoji = str(LATTE_EMOJI.MOON)
 
         view = ui.View()
         view.add_item(ui.Button(label='ɪɴᴠɪᴛᴇ ᴍᴇ', url=invite_url, emoji=invite_emoji))
@@ -91,12 +92,12 @@ class Misc(Cog):
         # total_commands = len(self.bot.tree._get_all_commands(guild=discord.Object(id=default_guild)))
 
         #emoji
-        latte_icon = latte_emoji('latte_icon')
-        member_emoji = latte_emoji('member')
-        bot_cmd = latte_emoji('bot_commands')
-        python_icon = latte_emoji('python')
-        dpy_icon = latte_emoji('dpy')
-        cursor_emoji = latte_emoji('cursor')
+        latte_icon = LATTE_EMOJI.LATTE_ICON
+        member_emoji = LATTE_EMOJI.MEMBER
+        bot_cmd = LATTE_EMOJI.BOT_COMMANDS
+        python_icon = LATTE_EMOJI.PYTHON
+        dpy_icon = LATTE_EMOJI.DPY
+        cursor_emoji = LATTE_EMOJI.CURSOR
 
         embed = discord.Embed(color=self.bot.theme)
         embed.set_author(name=f"About Me", icon_url=self.bot.user.avatar)
@@ -124,8 +125,8 @@ class Misc(Cog):
         embed.add_field(name='ᴜᴘᴛɪᴍᴇ:', value=f"{self.bot.launch_time}", inline=False)
 
         # emoji 
-        staciax_emoji = self.bot.get_emoji(941961591610556457)
-        latte_support_emoji = self.bot.get_emoji(941971854728511529)
+        staciax_emoji = str(LATTE_EMOJI.STACIA)
+        latte_support_emoji = str(LATTE_EMOJI.LATTE_SUPPORT)
 
         owner_ = owner_bot.name, f'https://discord.com/users/{owner_bot.id}', staciax_emoji
         server_ = 'ꜱᴇʀᴠᴇʀ', self.bot.latte_supprt_url, latte_support_emoji
@@ -147,8 +148,8 @@ class Misc(Cog):
         support_url = self.bot.latte_supprt_url
         support_guild = self.bot.latte_support
         support_guild_icon = support_guild.icon
-        support_emoji = self.bot.get_emoji(941971854728511529)
-        stacia_emoji = self.bot.get_emoji(948850880617250837)
+        support_emoji = str(LATTE_EMOJI.LATTE_SUPPORT)
+        stacia_emoji = str(LATTE_EMOJI.STACIA)
 
         embed = discord.Embed(color=self.bot.theme)
         embed.description = f'ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀꜱ: {support_guild.member_count}'

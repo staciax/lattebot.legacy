@@ -229,7 +229,7 @@ class TwoFA_UI(ui.Modal, title='Two-factor authentication'):
             elif auth['auth'] == 'failed':
                 return await send_embed(auth['error'])
     
-    async def on_error(self, error: Exception, interaction: Interaction) -> None:
+    async def on_error(self, interaction: Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True) 
 
 class TwoFA_UI_Temp(ui.Modal, title='Two-factor authentication'):
@@ -281,7 +281,7 @@ class TwoFA_UI_Temp(ui.Modal, title='Two-factor authentication'):
                 ...
                 # return await send_embed(auth['error'])
     
-    async def on_error(self, error: Exception, interaction: Interaction) -> None:
+    async def on_error(self, interaction: Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True) 
 
 class SearchSourcePage(menus.ListPageSource):
@@ -807,7 +807,8 @@ class InventoryView(ui.View):
 
     @ui.button(emoji='🔫', style=ButtonStyle.primary)
     async def weapon_button(self, interaction:Interaction, button: ui.Button):
-        self.build_page()
+        if len(self.skin_page) == 0:
+            self.build_page()
         embeds_list = self.skin_page
         view = WeasponView(interaction, embeds_list, self)
         await view.start()

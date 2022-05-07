@@ -9,7 +9,8 @@ from typing import Literal, Optional, Union, Any, Tuple, List, Dict
 
 from datetime import datetime, time
 from utils.bot_base import Latte_Bot
-from utils.checks import owner_only, cooldown_for_everyone_but_me, only_latte_guild
+from utils.emojis import LATTE_EMOJI
+from utils.checks import owner_only, cooldown_for_everyone_but_me
 from ext.valorant.locale import LocaleResponse, InteractionLanguage
 
 # valorant extension
@@ -24,7 +25,8 @@ class Notifys(commands.Cog):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(840678426867793921)
+        return str(LATTE_EMOJI.MOLANG_COFFEE)
+        # return self.bot.get_emoji(840678426867793921)
 
     def cog_unload(self) -> None:
         self.notifys.cancel()
@@ -55,7 +57,7 @@ class Notifys(commands.Cog):
                     await Generate_Embed.notify_specified(data_spc, skin_list, author, self.bot.db)
 
             except Exception as e:
-                print(e)
+                print('send_notify', e)
 
     @tasks.loop(time=time(hour=0, minute=0, second=10)) #utc 00:00:15
     # @tasks.loop(seconds=10)  # utc 00:00:15
@@ -123,8 +125,10 @@ class Notifys(commands.Cog):
     @notify_add.autocomplete('skin')
     async def notify_add_autocomplete(self, interaction: Interaction, current: str) -> List[app_commands.Choice[str]]:
   
-        skindata = JSON.read('cache')
-        skin_list = [skindata['skins'][x] for x in skindata['skins']]
+        await interaction.response.defer()
+
+        cache = JSON.read('cache')
+
         default_language = 'en-US'
 
         choice_list = {}
@@ -132,17 +136,18 @@ class Notifys(commands.Cog):
         namespace = interaction.namespace.skin
         namespace_split = str(namespace).lower().split()
 
-        for skin in skin_list:
-            name: str = skin['names'][default_language]
-            name_split = name.split()
-            with contextlib.suppress(IndexError):
-                if name.lower().startswith(tuple(namespace_split)):
-                    if len(namespace_split) > 1:
-                        for item in name_split:
-                            if item.lower().startswith(namespace_split[1]):
-                                choice_list[name] = skin['uuid']
-                    else:
-                        choice_list[name] = skin['uuid']
+        for skin in cache['skins'].values():
+            if skin['levelone']:
+                name: str = skin['names'][default_language]
+                name_split = name.split()
+                with contextlib.suppress(IndexError):
+                    if name.lower().startswith(tuple(namespace_split)):
+                        if len(namespace_split) > 1:
+                            for item in name_split:
+                                if item.lower().startswith(namespace_split[1]) and name.lower() != item.lower():
+                                    choice_list[name] = skin['uuid']
+                        else:
+                            choice_list[name] = skin['uuid']
 
         if not choice_list:
             popular_skin =(
@@ -150,14 +155,12 @@ class Notifys(commands.Cog):
             'recon', 'sovereign', 'sentinels', 'blastx', 'ion', 'oni'
         )
             popular_skin_shuffle = tuple(random.sample(popular_skin, len(popular_skin)))
-            random.shuffle(skin_list)
-            return [app_commands.Choice(name=skin['names'][default_language], value=skin['uuid']) for skin in sorted(skin_list, key=lambda c: c['names'][default_language]) \
-                if skin['names'][default_language].lower().startswith(popular_skin_shuffle[:2])
+            return [app_commands.Choice(name=skin['names'][default_language], value=skin['uuid']) for skin in sorted(cache['skins'].values(), key=lambda x: x['names'][default_language]) \
+                if skin['names'][default_language].lower().startswith(popular_skin_shuffle[:2]) and skin['levelone']
             ][:10]
 
         return [app_commands.Choice(name=name_x, value=uuid) for name_x, uuid in sorted(choice_list.items(), key=lambda x: x[0])][:12]
 
-       
     @notify.command(name='list', description='View skins you have set a for notification.')
     @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
     async def notify_list(self, interaction: Interaction) -> None:
@@ -233,7 +236,7 @@ class Notifys(commands.Cog):
         except HTTPException:
             raise RuntimeError(response_test.get('FAILED_SEND_NOTIFY'))
         except Exception as e:
-            print(e)
+            print('notify_test', e)
             raise RuntimeError(f"{response_test.get('FAILED_SEND_NOTIFY')} - {e}")
         else:
             await interaction.followup.send(embed=Embed(response_test.get('NOTIFY_IS_WORKING'), color=0x77dd77), ephemeral=True)
@@ -247,7 +250,8 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
     @property
     def display_emoji(self) -> discord.Emoji:
-        return self.bot.get_emoji(955743009138429962)
+        return str(LATTE_EMOJI.VALORANT)
+        # return self.bot.get_emoji(955743009138429962)
 
     @commands.Cog.listener('on_guild_remove')
     async def remove_guild(self, guild: discord.Guild):
@@ -636,45 +640,91 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         endpoint = await self.get_endpoint(interaction.user.id, interaction.locale)
 
         data = endpoint.fetch_player_loadout()
+
         loadout = GetFormat.inventory(data)
         
         view = InventoryView(interaction, loadout, endpoint, data, language)
         await view.start()
 
+    # ---------- PRIVATE FUNCTIONS ---------- #
+
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
-    @only_latte_guild()
-    async def dodge(self, interaction: Interaction) -> None:
+    @app_commands.guilds(discord.Object(id=840379510704046151))
+    async def dodge(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """Valorant: Dodge a match"""
 
         await interaction.response.defer(ephemeral=True)
 
-        # language
-        language = InteractionLanguage(interaction.locale)
-        response = LocaleResponse(interaction.command.name, interaction.locale)
-
-        endpoint = await self.get_endpoint(interaction.user.id)
+        endpoint = await self.get_endpoint(interaction.user.id, interaction.locale, username, password)
         endpoint.pregame_quit_match()
 
         await interaction.followup.send('Dogged!', ephemeral=True)
+
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=840379510704046151))
+    @app_commands.choices(agents=[app_commands.Choice(name=name, value=name) for name, uuid in AgentID.items()])
+    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @app_commands.describe(agents='Choose the agent')
+    async def instalock(self, interaction: Interaction, agents: str, username: str = None, password: str = None) -> None:
+        """Valorant: Instalock a agent"""
+
+        import time
+        from ext.valorant.resources import agents_emoji
+
+        await interaction.response.defer(ephemeral=True)
+
+        endpoint = await self.get_endpoint(interaction.user.id, interaction.locale, username, password)
+
+        timeout = 30 # 1 minute
+        timeout_start = time.time()
+    
+        match = None
+        while time.time() < timeout_start + timeout:
+            try:
+                match = endpoint.pregame_fetch_player()
+            except PhaseError:
+                pass
+            else:
+                if not match:
+                    raise RuntimeError('No match found')
+                break
+            
+            await asyncio.sleep(1)
         
+        await asyncio.sleep(3)
+
+        agent_id = AgentID.get(agents)
+        emoji = agents_emoji[agents]
+        match_id = match["MatchID"]
+        endpoint.pregame_lock_character(agent_id, match_id)
+        
+        await interaction.followup.send(f"**Instalock:** {emoji} {agents}")
+                
     # @valorant.command()
-    # async def rank(self, interaction: Interaction) -> None:
-    #     """Shows your ranking"""
+    # async def rank(self, interaction: Interaction, name:str, tag: str) -> None:
+    #     """Shows rank by name and tag"""
+        ...
+        # # language
+        # language = InteractionLanguage(interaction.locale)
+        # response = LocaleResponse(interaction.command.name, interaction.locale)
 
-    #     user_id = interaction.user.id
-    #     data = await self.db.is_data(user_id)
+        # endpoint = await self.get_endpoint(self.bot.owner_id, interaction.locale)
+        # endpoint.fetch_player_mmr()
 
-    #     player = data['player_name']
 
-    #     api = VALORANT_ENDPOINT(data)
-    #     api.activate()
+        # user_id = interaction.user.id
+        # data = await self.db.is_data(user_id)
 
-    #     rank = api.get_player_tier_rank()
-    #     rank_emoji = ranks[str(rank)]['emoji']
-    #     rank_name = ranks[str(rank)]['name']
+        # player = data['player_name']
 
-    #     return await interaction.response.send_message(f"{player}")
+        # api = VALORANT_ENDPOINT(data)
+        # api.activate()
+
+        # rank = api.get_player_tier_rank()
+        # rank_emoji = ranks[str(rank)]['emoji']
+        # rank_name = ranks[str(rank)]['name']
+
+        # return await interaction.response.send_message(f"{player}")
 
     # @valorant.command()
     # @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
@@ -731,38 +781,6 @@ class ValorantCommands(commands.Cog, name='Valorant'):
                 
     #     await interaction.response.send_message('testing', view=PartyView(interaction))
     
-    # @valorant.command()
-    # # @only_latte_guild()
-    # @app_commands.choices(agents=[app_commands.Choice(name=name, value=name) for name, uuid in AgentID.items()])
-    # async def instalock(self, interaction: Interaction, agent_pick: str) -> None:
-        
-    #     await interaction.response.defer(ephemeral=True)
-    #     endpoint = await self.get_endpoint(interaction.user.id)
-
-    #     count = 0
-    #     while True:
-    #         try:
-    #             match = endpoint.pregame_fetch_player()
-    #         except Exception as e:
-    #             pass
-    #         else:
-    #             break
-
-    #         if count >= 60:
-    #             return await interaction.followup.send("timeout")
-            
-    #         await asyncio.sleep(1)
-    #         count += 1
-
-    #     agent_id = AgentID[agent_pick]
-    #     emoji = agents_emoji[agent_pick]
-    #     match_id = match["MatchID"]
-    #     match_info = endpoint.pregame_fetch_match(match_id)
-    #     team_id = match_info['AllyTeam']['TeamID']
-
-    #     endpoint.pregame_lock_character(agent_id, match_id)
-    #     await interaction.followup.send(embed=Embed(f'Locked {emoji} {agent_pick}'))
-
     # @app_commands.command()
     # @valorant.command()
     # @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
