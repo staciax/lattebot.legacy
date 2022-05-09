@@ -211,16 +211,16 @@ class Latte_Bot(commands.AutoShardedBot):
             "min_size": 1,
             "max_size": 5
         }
-        localhost = {
-            "user": "postgres",
-            "password": "RENLYX9",
-            "database": "postgres",
-            "host": "localhost",
-            "port": "5432"
-        }
+        # localhost = {
+        #     "user": "postgres",
+        #     "password": "RENLYX9",
+        #     "database": "postgres",
+        #     "host": "localhost",
+        #     "port": "5432"
+        # }
         db = None
         try:
-            db = await asyncpg.create_pool(**localhost)
+            db = await asyncpg.create_pool(**credentials)
         except Exception as e:
             print(e)
             self.log.error(f"Failed to create database pool.")
