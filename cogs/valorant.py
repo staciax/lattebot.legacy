@@ -4,13 +4,14 @@ import random
 import contextlib
 from discord.ext import commands, tasks
 from discord import app_commands, Interaction, Forbidden, HTTPException
+from discord.app_commands.checks import dynamic_cooldown
 from discord.utils import MISSING
 from typing import Literal, Optional, Union, Any, Tuple, List, Dict
 
 from datetime import datetime, time
 from utils.bot_base import Latte_Bot
 from utils.emojis import LATTE_EMOJI
-from utils.checks import owner_only, cooldown_for_everyone_but_me
+from utils.checks import owner_only, cooldown_for_everyone_but_me, cooldown_10s, cooldown_5s
 from ext.valorant.locale import LocaleResponse, InteractionLanguage
 
 # valorant extension
@@ -80,7 +81,7 @@ class Notifys(commands.Cog):
     notify = app_commands.Group(name='notify', description='Notify commands')
 
     @notify.command(name='add', description='Set a notification when a specific skin is available on your store')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(skin='The name of the skin you want to notify')
     async def notify_add(self, interaction: Interaction, skin: str) -> None:
         """Set a notification when a specific skin is available on your store"""
@@ -162,7 +163,7 @@ class Notifys(commands.Cog):
         return [app_commands.Choice(name=name_x, value=uuid) for name_x, uuid in sorted(choice_list.items(), key=lambda x: x[0])][:12]
 
     @notify.command(name='list', description='View skins you have set a for notification.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def notify_list(self, interaction: Interaction) -> None:
         """View skins you have set a notification for"""
 
@@ -179,7 +180,7 @@ class Notifys(commands.Cog):
     
     @notify.command(name='mode', description='Change notification mode')
     @app_commands.describe(mode='Choose notification')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def notify_mode(self, interaction: Interaction, mode: Literal['Specified Skin', 'All Skin', 'Off']) -> None:
         """Set Skin Notifications mode"""
 
@@ -205,7 +206,7 @@ class Notifys(commands.Cog):
         return await interaction.response.send_message(embed=embed)
 
     @notify.command(name='test', description='Testing notification')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def notify_test(self, interaction: Interaction) -> None:
 
         await interaction.response.defer(ephemeral=True)
@@ -280,7 +281,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         return endpoint
 
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username', password='Input password')
     async def login(self, interaction: Interaction, username: str, password: str) -> None:
         """Log in with your Riot accounts"""
@@ -315,7 +316,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
             await interaction.response.send_modal(modal)
 
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def logout(self, interaction: Interaction) -> None:
         """Logout and Delete your accounts from database"""
 
@@ -347,7 +348,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
             await view.message.edit(content=f'\u200b', view=None)
 
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     async def store(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """Shows your daily store in your accounts"""
@@ -369,7 +370,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         
     @app_commands.command()
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def battlepass(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """View your battlepass current tier"""
 
@@ -393,7 +394,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
     @app_commands.command()
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def point(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """View your remaining Valorant and Riot Points (VP/RP)"""
 
@@ -414,7 +415,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         await interaction.followup.send(embed=embed, view=share_button(interaction, [embed]) if is_private_message else MISSING)
 
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     async def mission(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """View your daily/weekly mission progress"""
@@ -436,31 +437,8 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
         await interaction.followup.send(embed=embed, view=share_button(interaction, [embed]) if is_private_message else MISSING)
 
-    @app_commands.command()
-    @app_commands.describe(cookie='Your cookies')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
-    async def cookies(self, interaction: Interaction, cookie: str) -> None:
-        """Log in with your Riot acoount by Cookies"""
-
-        # language
-        language = InteractionLanguage(interaction.locale)
-        response = LocaleResponse(interaction.command.name, interaction.locale)
-
-        await interaction.response.defer()
-        response = await self.db.cookie_login(interaction.user.id, cookie, interaction.guild_id, interaction.locale)
-
-        if response['auth']:
-            embed = Embed(f"Successfully logged in as **{response['player']}!**")
-            await interaction.followup.send(embed=embed, ephemeral=True)
-            return
-
-        elif not response['auth']:
-            raise RuntimeError(f"{response['error']}")
-        
-        raise RuntimeError(f"2FA Code is valid")
-
     @app_commands.command(name='nightmarket')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     async def nightmarket(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """Show skin offers on the nightmarket"""
@@ -483,7 +461,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     # inspired by https://github.com/giorgi-o
     @app_commands.command(description="inspect a specific bundle")
     @app_commands.describe(bundle="The name of the bundle you want to inspect!")
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def bundle(self, interaction: Interaction, bundle: str) -> None:
         
         await interaction.response.defer()
@@ -553,8 +531,31 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     valorant = app_commands.Group(name='valorant', description='valorant commands')
 
     @valorant.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @app_commands.describe(cookie='Your cookies')
+    @dynamic_cooldown(cooldown_5s)
+    async def cookies(self, interaction: Interaction, cookie: str) -> None:
+        """Log in with your Riot acoount by Cookies"""
+
+        # language
+        language = InteractionLanguage(interaction.locale)
+        response = LocaleResponse(interaction.command.name, interaction.locale)
+
+        await interaction.response.defer()
+        response = await self.db.cookie_login(interaction.user.id, cookie, interaction.guild_id, interaction.locale)
+
+        if response['auth']:
+            embed = Embed(f"Successfully logged in as **{response['player']}!**")
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
+
+        elif not response['auth']:
+            raise RuntimeError(f"{response['error']}")
+        
+        raise RuntimeError(f"2FA Code is valid")
+
+    @valorant.command()
     @app_commands.describe(region='Select region to get the leaderboard')
+    @dynamic_cooldown(cooldown_5s)
     async def leaderboard(self, interaction: Interaction, region: Literal['AP', 'EU', 'NA', 'KR']) -> None:
         """Shows your Region Leaderboard"""
 
@@ -575,7 +576,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         await p.start()
 
     @valorant.command(name='info')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def _info(self, interaction: Interaction) -> None:
         """Shows your account info"""
 
@@ -588,6 +589,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
     @valorant.command()
     @app_commands.choices(name=[app_commands.Choice(name=name, value=uuid) for name, uuid in AgentID.items()])
+    @app_commands.describe(name='Select agents')
     async def agent(self, interaction: Interaction, name: str = None) -> None:
         
         view = AgentInfoView(interaction)
@@ -627,7 +629,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         await interaction.followup.send(embed=Embed(f'Successfully cleared database `valorant.{clear_type.lower()}`'))
 
     @valorant.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def inventory(self, interaction: Interaction) -> None:
         """Shows your inventory"""
 
@@ -650,6 +652,8 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=840379510704046151))
+    @app_commands.describe(username='Input username (without login)', password='password (without login)')
+    @dynamic_cooldown(cooldown_5s)
     async def dodge(self, interaction: Interaction, username: str = None, password: str = None) -> None:
         """Valorant: Dodge a match"""
 
@@ -663,8 +667,8 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=840379510704046151))
     @app_commands.choices(agents=[app_commands.Choice(name=name, value=name) for name, uuid in AgentID.items()])
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
-    @app_commands.describe(agents='Choose the agent')
+    @app_commands.describe(agents='Choose the agent', username='Input username (without login)', password='password (without login)')
+    @dynamic_cooldown(cooldown_5s)
     async def instalock(self, interaction: Interaction, agents: str, username: str = None, password: str = None) -> None:
         """Valorant: Instalock a agent"""
 
@@ -699,11 +703,65 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         endpoint.pregame_lock_character(agent_id, match_id)
         
         await interaction.followup.send(f"**Instalock:** {emoji} {agents}")
-                
+
+    # @valorant.command()
+    # # @app_commands.guilds(discord.Object(id=840379510704046151))
+    # @dynamic_cooldown(cooldown_5s)
+    # async def party(self, interaction: Interaction) -> None:
+    #     """Valorant: Party"""
+        
+    #     endpoint = await self.get_endpoint(interaction.user.id, interaction.locale)
+
+    #     def member_embed(entries: Dict) -> discord.Embed:
+    #         embed = discord.Embed(description='Player Name')
+    #         embed.set_thumbnail(url=entries['icon']['large'])
+    #         return embed
+
+    #     import time
+        
+    #     timeout = 60 # 1 minute
+    #     timeout_start = time.time()
+        
+    #     while time.time() < timeout_start + timeout:
+    #         try:
+    #             party = endpoint.party_fetch_player()
+    #             print(party)
+    #         except PhaseError:
+    #             pass
+    #         else:
+    #             break
+            
+    #         await asyncio.sleep(1)
+
+    # ---------- VALORANT TESTING ---------- #
+
+    # valorant_test = app_commands.Group(name='valorant_test', description='valorant test commands', guild_ids=[965942839563386910])
+
+    # @valorant_test.command()
+    # async def match_history(self, interaction: Interaction) -> None:
+    #     """Test: Party"""
+        
+    #     endpoint = await self.get_endpoint(interaction.user.id, interaction.locale)
+
+    #     competitive = endpoint.fetch_match_history(puuid='47bbe7de-0d6c-5c3d-978f-1c2bb529ed7d', queue_id="competitive")
+
+    #     print(competitive)
+    #     last_competitive = competitive['History'][0]
+
+    #     match_id = last_competitive['MatchID']
+    #     queue_id = last_competitive['QueueID']
+    #     start_time = last_competitive['GameStartTime']
+
+    #     match = endpoint.fetch_match_details(match_id)
+
+    #     JSON.save('match', match)
+
+    #     await interaction.response.send_message("Done")
+    
     # @valorant.command()
     # async def rank(self, interaction: Interaction, name:str, tag: str) -> None:
     #     """Shows rank by name and tag"""
-        ...
+    
         # # language
         # language = InteractionLanguage(interaction.locale)
         # response = LocaleResponse(interaction.command.name, interaction.locale)
@@ -727,7 +785,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         # return await interaction.response.send_message(f"{player}")
 
     # @valorant.command()
-    # @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    # @dynamic_cooldown(cooldown_5s)
     # async def party(self, interaction: Interaction):
     #     endpoint = await self.get_endpoint(interaction.user.id)
     #     from ext.valorant.resources import agents_emoji
@@ -783,7 +841,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     
     # @app_commands.command()
     # @valorant.command()
-    # @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    # @dynamic_cooldown(cooldown_5s)
     # @only_latte_guild()
     # async def party(self, interaction: Interaction) -> None:
     #     """ Pick Agent """

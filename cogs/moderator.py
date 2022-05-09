@@ -2,9 +2,10 @@ import discord
 from discord import Interaction
 from discord.ext import commands
 from discord import app_commands
+from discord.app_commands.checks import dynamic_cooldown
 from typing import Literal
 
-from utils.checks import cooldown_for_everyone_but_me
+from utils.checks import cooldown_5s
 from utils import Cog
 from utils.emojis import LATTE_EMOJI
 
@@ -21,7 +22,7 @@ class Mod(Cog):
     @app_commands.checks.has_permissions(manage_messages=True, read_message_history=True)
     @app_commands.checks.bot_has_permissions(manage_messages=True, read_message_history=True)
     @app_commands.default_permissions(manage_messages=True, read_message_history=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def clear(
         self,
         interaction: Interaction,

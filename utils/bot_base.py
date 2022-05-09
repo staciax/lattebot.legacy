@@ -77,7 +77,7 @@ class Latte_Bot(commands.AutoShardedBot):
         self.last_update = [2022, 3, 15]
         self.launch_time = f'<t:{round(datetime.now().timestamp())}:R>'
         self.latte_activity = 'nyanpasu ♡ ₊˚'
-        self.line_count = count_python('.')
+        self.line_count = count_python
         
         # guild cache stuff
         self.latte_guild_id = 840379510704046151
@@ -220,7 +220,7 @@ class Latte_Bot(commands.AutoShardedBot):
         }
         db = None
         try:
-            db = await asyncpg.create_pool(**credentials)
+            db = await asyncpg.create_pool(**localhost)
         except Exception as e:
             print(e)
             self.log.error(f"Failed to create database pool.")

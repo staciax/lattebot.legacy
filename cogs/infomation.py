@@ -3,6 +3,7 @@ from discord import Interaction
 from discord.ext import commands
 from discord import app_commands
 from discord import ui
+from discord.app_commands.checks import dynamic_cooldown
 from typing import Union, Optional, Literal
 from discord import Asset, Member, User
 
@@ -10,7 +11,7 @@ from utils import Cog
 from utils.view import AvatarView
 from utils.utils import Banner, get_dominant_color
 from utils.formats import deltaconv
-from utils.checks import cooldown_for_everyone_but_me
+from utils.checks import cooldown_5s
 from utils.emojis import LATTE_EMOJI
 
 deafult_guild = discord.Object(id=840379510704046151)
@@ -25,7 +26,7 @@ class Infomation(Cog):
     
     @app_commands.command()
     @app_commands.describe(member='The member you want to get the avatar of.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def avatar(self, interaction: Interaction, member: Union[discord.Member, discord.User] = None):
         """Shows the user avatar of the specified member."""
 
@@ -39,7 +40,7 @@ class Infomation(Cog):
 
     @app_commands.command()
     @app_commands.describe(member='The member you want to get the avatar of.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def banner(self, interaction: Interaction, member:Union[discord.Member, discord.User] = None):
         """Shows the banner of the specified member."""
         member = member or interaction.user
@@ -71,7 +72,7 @@ class Infomation(Cog):
 
     @app_commands.command()
     @app_commands.describe(choose='Choose the option you want to get.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def server(self, interaction: Interaction, choose: Literal['Icon', 'Banner', 'Splash']):
         """Get server icon, banner or splash."""
         guild = interaction.guild
@@ -91,7 +92,7 @@ class Infomation(Cog):
     @app_commands.command()
     @app_commands.describe(channel='The channel you want to get the first message')
     @app_commands.checks.bot_has_permissions(read_message_history=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def first_message(self, interaction: Interaction, channel: discord.TextChannel = None):
         """Shows the first message of the specified channel."""
         channel = channel or interaction.channel

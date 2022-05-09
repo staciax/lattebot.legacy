@@ -144,7 +144,7 @@ def fetch_playertitles() -> None:
             json[title['uuid']] = {
                 'uuid': title['uuid'],
                 'names': title['displayName'],
-                'text': title['titleText']
+                'texts': title['titleText']
             }
         data['titles'] = json
         JSON.save('cache', data)

@@ -95,9 +95,13 @@ def timestamp_utc() -> datetime.datetime:
 def reading_recursive(root: str, /) -> int:
     for x in os.listdir(root):
         if os.path.isdir(x):
-            yield from reading_recursive(root + "/" + x)
+            yield from reading_recursive(root + "/" + x) 
+            # for y in os.listdir(root + "/" + x):
+            #     if os.path.isdir(root + "/" + x + "/" + y):
+            #         yield from reading_recursive(root + "/" + x + "/" + y)  
         else:
-            if x.endswith((".py", ".json")):
+            if x.endswith((".py")) and not root.startswith('./.test'):
+                # print(root + "/" + x)
                 with open(f"{root}/{x}" , encoding="utf-8") as r:
                     yield len(r.readlines())
 

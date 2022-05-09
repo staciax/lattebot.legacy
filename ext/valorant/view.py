@@ -689,12 +689,16 @@ class InventoryView(ui.View):
         self.endpoint = endpoint
         self.raw_loadout = raw_loadout
         self.language = language
+        self.message: Optional[discord.Message] = None
         self.sprays_page = []
         self.skin_page = []
         from itertools import cycle
         card_type = ['wide','large', 'small']
         self.card_type_cycle = cycle(card_type)
-        super().__init__()
+        super().__init__(timeout=120)
+
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None)
 
     # @ui.button(label='Player Card')
     # async def card_button(self, interaction:Interaction, button: ui.Button):
@@ -925,7 +929,7 @@ class InventoryView(ui.View):
     def main_page(self):
         from utils.utils import get_dominant_color
         icon = self.loadout['playercard']['icon'][next(self.card_type_cycle)]
-        title = self.loadout['playertitle']['names'][self.language]
+        title = self.loadout['playertitle']['texts'][self.language]
 
         embed = discord.Embed(title=title, color=get_dominant_color(icon))
         embed.set_author(name=self.endpoint.player)
@@ -935,4 +939,4 @@ class InventoryView(ui.View):
 
     async def start(self):
         embed = self.main_page()
-        await self.interaction.followup.send(embed=embed, view=self)
+        self.message = await self.interaction.followup.send(embed=embed, view=self)

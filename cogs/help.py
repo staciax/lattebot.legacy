@@ -1,20 +1,17 @@
-
 from __future__ import annotations
 
 # Standard
 import discord
-import contextlib
 from discord import Interaction, ui
-from discord.ext import commands, menus
+from discord.ext import commands
 from discord import app_commands
+from discord.app_commands.checks import dynamic_cooldown
 
 from typing import Any, Dict, List, Optional, Union, Literal
 from datetime import datetime, timedelta, timezone
 
-from utils.formats import count_python
-from utils.useful import LatteEmbed
 from utils.view import ViewAuthor
-from utils.checks import cooldown_for_everyone_but_me
+from utils.checks import cooldown_5s
 from utils import Latte_Bot
 from utils.emojis import LATTE_EMOJI
 
@@ -207,14 +204,14 @@ class HelpView(ViewAuthor):
         self.first_page.disabled = page == 0
         self.last_page.disabled = page == total
 
-    # async def on_timeout(self) -> None:
-    #     self.clear_items()
-    #     support_emoji = LATTE_EMOJI.LATTE_SUPPORT
-    #     latte_emoji = LATTE_EMOJI.LATTE_ICON
+    async def on_timeout(self) -> None:
+        self.clear_items()
+        support_emoji = LATTE_EMOJI.LATTE_SUPPORT
+        latte_emoji = LATTE_EMOJI.LATTE_ICON
         
-    #     self.add_item(ui.Button(label='ꜱᴜᴘᴘᴏʀᴛ ꜱᴇʀᴠᴇʀ', url=self.bot.latte_supprt_url, emoji=support_emoji))
-    #     self.add_item(ui.Button(label='ɪɴᴠɪᴛᴇ ᴍᴇ', url=self.bot.invite_url, emoji=latte_emoji))
-    #     await self.interaction.edit_original_message(view=self)
+        self.add_item(ui.Button(label='ꜱᴜᴘᴘᴏʀᴛ ꜱᴇʀᴠᴇʀ', url=self.bot.latte_supprt_url, emoji=str(support_emoji)))
+        self.add_item(ui.Button(label='ɪɴᴠɪᴛᴇ ᴍᴇ', url=self.bot.invite_url, emoji=str(latte_emoji)))
+        await self.interaction.edit_original_message(view=self)
 
     async def start(self):
         self.add_item(HelpSelectMenu(self.data, self.bot))
@@ -225,6 +222,7 @@ class HelpView(ViewAuthor):
         await self.show_page(self.interaction, 0, 'send_message')
         
 class HelpCommand:
+
     def __init__(self, interaction: Interaction) -> None:
         self.bot: Latte_Bot = getattr(interaction, "client", interaction._state._get_client())
         self.interaction = interaction
@@ -271,13 +269,13 @@ class Help(commands.Cog):
 
     @app_commands.command(name='help')
     @app_commands.describe(category='Choose a category to get more informations about it.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def help_(
         self,
         interaction: Interaction,
         category: str = None
     ):  
-        """Help commands"""
+        """Help"""
         Help = HelpCommand(interaction)
         await Help.command_callback(category)
 

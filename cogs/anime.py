@@ -2,6 +2,7 @@ import discord
 from discord import Interaction
 from discord.ext import commands
 from discord import app_commands
+from discord.app_commands.checks import dynamic_cooldown
 from discord.app_commands import Choice
 
 from typing import List, Literal
@@ -9,7 +10,7 @@ from typing import List, Literal
 from utils import Latte_Bot
 from utils.emojis import LATTE_EMOJI
 from utils.anime_api import *
-from utils.checks import is_nsfw, cooldown_for_everyone_but_me
+from utils.checks import is_nsfw, cooldown_5s
 
 SFW1 = Literal['Awoo', 'Bite', 'Blush', 'Bonk', 'Breast', 'Bully', 'Cringe', 'Cry', 'Cuddle', 'Dance', 'Glomp', 'Handhold', 'Happy', 'Highfive', 'Hug', 'Kick', 'Kill', 'Kiss', 'Lick', 'Maid']
 SFW2 = Literal['Marin-kitagawa', 'Megumin', 'Mori-calliope', 'Neko', 'Nom', 'Oppai', 'Pat', 'Poke', 'Raiden-shogun', 'Selfies', 'Shinobu', 'Slap', 'Smile', 'Smug', 'Uniform', 'Waifu.im', 'Waifu.pisc', 'Wave', 'Wink', 'Yeet']
@@ -30,7 +31,7 @@ class Anime(commands.Cog):
 
     @waifu.command(name='sfw')
     @app_commands.describe(tags='pick tags')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def waifu_sfw(self, interaction: Interaction, tags: SFW1) -> None:
         """Display waifu sfw."""
 
@@ -39,7 +40,7 @@ class Anime(commands.Cog):
         await view.start()
 
     @waifu.command(name='sfw2')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(tags='pick tags')
     async def waifu_sfw2(self, interaction: Interaction, tags: SFW2) -> None:
         """Display waifu sfw."""

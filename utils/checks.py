@@ -15,13 +15,23 @@ def is_nsfw() -> app_commands.check:
     return app_commands.check(predicate)
 
 def cooldown_for_everyone_but_me(interaction: discord.Interaction) -> Optional[app_commands.Cooldown]:
-    if interaction.user.id == 894088743475101697:
+    if interaction.user.id == 240059262297047041:
         return None
     return app_commands.Cooldown(1, 5)
 
 def only_latte_guild() -> app_commands.check:
     async def predicate(interaction: Interaction):
-        if interaction.guild.id == 840379510704046151:
+        if interaction.guild.id == 240059262297047041:
             return True
         return False
     return app_commands.check(predicate)
+
+def cooldown_5s(interaction: discord.Interaction) -> Optional[app_commands.Cooldown]:
+    if interaction.user.id == 240059262297047041:
+        return None
+    return app_commands.Cooldown(1, 5)
+
+def cooldown_10s(interaction: discord.Interaction) -> Optional[app_commands.Cooldown]:
+    if interaction.user.id == 240059262297047041:
+        return None
+    return app_commands.Cooldown(1, 10)

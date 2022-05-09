@@ -16,7 +16,17 @@ shard_region_override: dict = {
     "pbe": "na"
 }
 
-queues: list = ["competitive", "custom", "deathmatch", "ggteam", "snowball", "spikerush", "unrated", "onefa", "null"]
+queues: list = [
+    "competitive",
+    "custom",
+    "deathmatch",
+    "ggteam",
+    "snowball",
+    "spikerush",
+    "unrated",
+    "onefa",
+    "null"
+]
 
 class QueueID(Enum):
     COMPETITIVE = 'competitive'
@@ -168,7 +178,7 @@ points: dict = {
     'rad':'<:RadianitePoint:970261814157910066>'
 }
 
-def get_item_type(uuid: str):
+def get_item_type(uuid: str) -> str:
     """Get item type"""
     item_type = {
         '01bb38e1-da47-4e6a-9b3d-945fe4655707': 'Agents',

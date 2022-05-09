@@ -23,7 +23,7 @@ class JSON:
 
     def create(filename: str, formats: Dict) -> None:
         '''Create json file'''
-        file_path = f"ext/valorant/data/"+ filename +".json"
+        file_path =  f"ext/valorant/data/"+ filename +".json"
         file_dir = os.path.dirname(file_path)
         os.makedirs(file_dir, exist_ok=True)
         if not os.path.exists(file_path):

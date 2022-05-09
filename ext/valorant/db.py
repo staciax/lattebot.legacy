@@ -280,7 +280,7 @@ class ValorantDB:
         query = 'INSERT INTO valorant.notifys(user_id, uuid, guild_id) VALUES ($1, $2, $3);'
         await self.db.execute(query, skin_uuid, user_id, guild_id)
     
-    async def notify_status(self, user_id: int):
+    async def notify_status(self, user_id: int) -> None:
         notify_mode = await self._get_notify_mode(user_id)
         if notify_mode is None:
             query = 'UPDATE valorant.users SET notify_mode=$1 WHERE user_id = $2;'

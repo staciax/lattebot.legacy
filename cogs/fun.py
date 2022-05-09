@@ -2,10 +2,11 @@ import discord
 from discord import Member, User
 from discord import Interaction
 from discord import app_commands
+from discord.app_commands.checks import dynamic_cooldown
 from typing import Union
 
 from utils import Cog
-from utils.checks import cooldown_for_everyone_but_me
+from utils.checks import cooldown_5s
 
 class Fun(Cog):
     """Fun commands"""
@@ -16,7 +17,7 @@ class Fun(Cog):
     
     @app_commands.command(name='latte_say')
     @app_commands.describe(message='Input message', attachment='The attachment to send')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def latte_say(self, interaction: Interaction, message: str, attachment: discord.Attachment = None):
         """Message something you give latte to say."""
 
@@ -29,7 +30,7 @@ class Fun(Cog):
     @app_commands.command(name='saybot')
     @app_commands.describe(message='Input message', member="The member to say something to saybot", attachment="The attachment to send")
     @app_commands.checks.bot_has_permissions(manage_webhooks=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def saybot(self, interaction: Interaction, message: str, attachment: discord.Attachment = None, member: Union[Member, User] = None):
 
         """Your message to saybot"""

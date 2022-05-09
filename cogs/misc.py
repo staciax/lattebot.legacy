@@ -1,14 +1,17 @@
+import os
 import discord
 import platform
 import pygit2
 import itertools
 import datetime
+import psutil
 from discord import Interaction
 from discord import ui, Object
 from discord import app_commands
 from discord.ext import commands
 from discord.utils import format_dt, utcnow
-from utils.checks import cooldown_for_everyone_but_me
+from discord.app_commands.checks import dynamic_cooldown
+from utils.checks import cooldown_5s
 
 from utils import Cog
 from utils.emojis import LATTE_EMOJI
@@ -32,13 +35,15 @@ def get_latest_commits(limit: int = 5) -> str:
 class Misc(Cog):
     """Miscellaneous commands"""
 
+    # process = psutil.Process()
+
     @property
     def display_emoji(self) -> discord.Emoji:
         return str(LATTE_EMOJI.MISC)
         # return self.bot.get_emoji(914142887854358588)
     
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def ping(self, interaction: Interaction) -> None:
         """Show Bot latency."""
         latency = self.bot.latency * 1000
@@ -77,7 +82,7 @@ class Misc(Cog):
     
     @app_commands.command(name='about')
     @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def about(self, interaction: Interaction) -> None:
         """Shows basic information about the bot."""
 
@@ -98,15 +103,16 @@ class Misc(Cog):
         python_icon = LATTE_EMOJI.PYTHON
         dpy_icon = LATTE_EMOJI.DPY
         cursor_emoji = LATTE_EMOJI.CURSOR
+        # valorant_icon = LATTE_EMOJI.VALORANT
 
-        embed = discord.Embed(color=self.bot.theme)
+        embed = discord.Embed(color=self.bot.theme, timestamp=discord.utils.utcnow())
         embed.set_author(name=f"About Me", icon_url=self.bot.user.avatar)
-        embed.set_thumbnail(url=owner_bot.avatar)
-        embed.add_field(
-            name='ᴀʙᴏᴜᴛ ᴅᴇᴠᴇʟᴏᴘᴇʀ:',
-            value=f"ᴏᴡɴᴇʀ: [{owner_bot}](https://discord.com/users/{owner_bot.id}, '┐(・。・┐) ♪')",
-            inline=False
-        )
+        # embed.set_thumbnail(url=owner_bot.avatar)
+        # embed.add_field(
+        #     name='ᴀʙᴏᴜᴛ ᴅᴇᴠᴇʟᴏᴘᴇʀ:',
+        #     value=f"ᴏᴡɴᴇʀ: [{owner_bot}](https://discord.com/users/{owner_bot.id}, '┐(・。・┐) ♪')",
+        #     inline=False
+        # )
         embed.add_field(
             name='ʟᴀᴛᴇꜱᴛ ᴜᴘᴅᴀᴛᴇꜱ:',
             value=get_latest_commits(5),
@@ -114,15 +120,20 @@ class Misc(Cog):
         )
         embed.add_field(
             name='ꜱᴛᴀᴛꜱ:',
-            value=f"{cursor_emoji} ʟɪɴᴇ ᴄᴏᴜɴᴛ: `{self.bot.line_count}`\n{latte_icon} ꜱᴇʀᴠᴇʀꜱ: `{server_count}`\n{member_emoji} ᴜꜱᴇʀꜱ: `{member_count}`\n{bot_cmd} ᴄᴏᴍᴍᴀɴᴅꜱ: `{total_commands}`", 
-            inline=False
+            value=f"{latte_icon} ꜱᴇʀᴠᴇʀꜱ: `{server_count}`\n{member_emoji} ᴜꜱᴇʀꜱ: `{member_count}`\n{bot_cmd} ᴄᴏᴍᴍᴀɴᴅꜱ: `{total_commands}`", 
+            inline=True
         )
         embed.add_field(
             name='ʙᴏᴛ ɪɴꜰᴏ:',
-            value=f"{latte_icon} ʟᴀᴛᴛᴇ_ʙᴏᴛ: `{bot_version}`\n{python_icon} ᴘʏᴛʜᴏɴ: `{platform.python_version()}`\n{dpy_icon} ᴅɪꜱᴄᴏʀᴅ.ᴘʏ: `{discord.__version__}`",
-            inline=False
+            value=f"{cursor_emoji} ʟɪɴᴇ ᴄᴏᴜɴᴛ: `{(self.bot.line_count('.') + self.bot.line_count('ext/valorant'))}`\n{latte_icon} ʟᴀᴛᴛᴇ_ʙᴏᴛ: `{bot_version}`\n{python_icon} ᴘʏᴛʜᴏɴ: `{platform.python_version()}`\n{dpy_icon} ᴅɪꜱᴄᴏʀᴅ.ᴘʏ: `{discord.__version__}`",
+            inline=True
         )
-        embed.add_field(name='ᴜᴘᴛɪᴍᴇ:', value=f"{self.bot.launch_time}", inline=False)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+        embed.add_field(name='ᴘʀᴏᴄᴇꜱꜱ:', value=f"ᴄᴘᴜ ᴜꜱᴀɢᴇ: `{psutil.cpu_percent()}%`\nᴠɪʀᴛᴜᴀʟ ᴍᴇᴍᴏʀʏ: `{psutil.virtual_memory().percent}%`", inline=True)
+        embed.add_field(name='ᴜᴘᴛɪᴍᴇ:', value=f"{self.bot.launch_time}", inline=True)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+        embed.set_footer(text='Made by ꜱᴛᴀᴄɪᴀ.#7475', icon_url=owner_bot.avatar)
 
         # emoji 
         staciax_emoji = str(LATTE_EMOJI.STACIA)
@@ -133,13 +144,13 @@ class Misc(Cog):
 
         view = ui.View()
         view.add_item(ui.Button(label=owner_[0], emoji=owner_[2], url=owner_[1]))
-        view.add_item(ui.Button(label=server_[0], emoji=server_[2], url=server_[1]))
+        # view.add_item(ui.Button(label=server_[0], emoji=server_[2], url=server_[1]))
     
         await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command(name='support')
     @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def support(self, interaction: Interaction) -> None:
         """Sends the support server of the bot."""
 
@@ -167,7 +178,7 @@ class Misc(Cog):
     @app_commands.command(name='report')
     @app_commands.describe(message='Input report message"')
     @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def report(self, interaction: Interaction, message: str) -> None:
         """Report to owner bot"""
 
@@ -199,6 +210,16 @@ class Misc(Cog):
             timestamp=utcnow()
         )
         await interaction.followup.send(embed=embed)
+
+    # @app_commands.command(name='donate')
+    # @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
+    # @dynamic_cooldown(cooldown_5s)
+    # async def donate(self, interaction: Interaction) -> None:
+        
+    #     tipme_url = 'https://tipme.in.th/renlyx'
+    #     kofi_irl = 'https://ko-fi.com/staciax'
+
+        
 
 async def setup(bot):
     await bot.add_cog(Misc(bot))

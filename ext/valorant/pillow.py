@@ -6,7 +6,7 @@ from io import BytesIO
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-def generate_image(skin_list):
+def generate_image(skin_list) -> discord.File:
     
     # background
     background = Image.open('ext/valorant/assets/bg.png')

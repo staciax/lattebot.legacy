@@ -2,7 +2,7 @@
 import json
 import re
 import urllib3
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 
 # Third
 import requests
@@ -13,7 +13,7 @@ from .locale import LocaleErrorResponse
 # disable urllib3 warnings that might arise from making requests to 127.0.0.1
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def extract_tokens_from_url(URL: str, locale_code: str) -> Tuple[str, str]:
+def extract_tokens_from_url(URL: str, locale_code: str) -> Optional[Tuple[str, str]]:
     # language
     response = LocaleErrorResponse('AUTH', locale_code)
     
@@ -100,7 +100,7 @@ class Auth:
         
         raise RuntimeError(local_response.get('INVALID_PASSWORD'))
 
-    def get_entitlements_token(self, access_token: str) -> str:
+    def get_entitlements_token(self, access_token: str) -> Optional[str]:
 
         # language
         local_response = self.local_response()
@@ -121,7 +121,7 @@ class Auth:
         else:
             return entitlements_token
 
-    def get_userinfo(self, access_token: str) -> str:
+    def get_userinfo(self, access_token: str) -> Optional[str]:
 
         # language
         local_response = self.local_response()
@@ -144,7 +144,7 @@ class Auth:
         else:
             return puuid, name, tag
 
-    def get_region(self, access_token: str, token_id: str) -> str:
+    def get_region(self, access_token: str, token_id: str) -> Optional[str]:
         
         # language
         local_response = self.local_response()
@@ -256,7 +256,7 @@ class Auth:
 
         return data
     
-    def temp_auth(self, username: str, password: str):
+    def temp_auth(self, username: str, password: str) -> Optional[Dict]:
         
         authenticate = self.authenticate(username, password)
         if authenticate['auth'] == 'response':

@@ -6,6 +6,7 @@ from discord import Interaction, ui
 from discord.ext import commands, tasks
 from discord import app_commands
 from discord.app_commands import Choice
+from discord.app_commands.checks import dynamic_cooldown
 from datetime import datetime, timedelta
 from typing import Literal, Optional, Any
 
@@ -19,7 +20,7 @@ from discord_together import DiscordTogether
 from utils import Latte_Bot
 from utils.context_managers import UserLock
 from utils.emojis import LATTE_EMOJI
-from utils.checks import cooldown_for_everyone_but_me
+from utils.checks import cooldown_for_everyone_but_me, cooldown_5s
 
 activity_list = {
     'Youtube Together': 'youtube',
@@ -78,7 +79,7 @@ class Utility(commands.Cog):
     @app_commands.choices(activity=[app_commands.Choice(name=name, value=value) for name, value in activity_list.items()])
     @app_commands.describe(activity='Which activity to do in the channel', channel='Which channel to do the activity in')
     @app_commands.checks.bot_has_permissions(create_instant_invite=True)
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def activity(self, interaction: Interaction, activity: str, channel: Optional[discord.VoiceChannel] = None) -> None:
         """Start Discord Together activity"""
 
@@ -127,7 +128,7 @@ class Utility(commands.Cog):
 
     @app_commands.command()
     @app_commands.describe(site='URL of the site.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def screenshot(self, interaction: Interaction, site: str) -> None:
         """Take a screenshot from the specified url."""
         
@@ -143,7 +144,7 @@ class Utility(commands.Cog):
     
     @app_commands.command()
     @app_commands.describe(to_lang='Language to translate to.', source='Source content language.')
-    @app_commands.checks.dynamic_cooldown(cooldown_for_everyone_but_me)
+    @dynamic_cooldown(cooldown_5s)
     async def translate(self, interaction: Interaction, to_lang:str, source:str) -> None:
         """Translate your message"""
         
