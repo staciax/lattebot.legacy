@@ -271,7 +271,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     async def get_endpoint(self, user_id: int, locale_code: str, username:str = None, password: str= None) -> VALORANT_ENDPOINT:
         
         if username is not None and password is not None:
-            auth = self.db.auth
+            auth = Auth()
             auth.local_code = locale_code
             data = auth.temp_auth(username, password)
         elif username or password:
