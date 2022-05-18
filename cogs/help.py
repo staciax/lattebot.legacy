@@ -2,9 +2,8 @@ from __future__ import annotations
 
 # Standard
 import discord
-from discord import Interaction, ui
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, Interaction, ui
 from discord.app_commands.checks import dynamic_cooldown
 
 from typing import Any, Dict, List, Optional, Union, Literal

@@ -40,7 +40,7 @@
             "DAILY":"เควสรายวัน",
             "WEEKLY":"เควสรายสัปดาห์",
             "NEWPLAYER":"เควสผู้เล่นใหม่",
-            "NO_MISSION":"คุณได้เควสทั้งหมดแล้ว",
+            "NO_MISSION":"คุณได้ทำเควสหมดแล้ว",
             "DAILY_RESET":"รีเซ็ตใน {duration}",
             "REFILLS": "เติมใหม่ใน {duration}"
         },

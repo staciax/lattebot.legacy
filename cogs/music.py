@@ -7,10 +7,7 @@ import re
 import random
 import contextlib
 from discord.ext import commands
-from discord import app_commands
-from discord import ui
-from discord import ButtonStyle
-from discord import Interaction
+from discord import app_commands, ui, ButtonStyle, Interaction
 from typing import Union, Tuple, Optional, Literal, List
 from wavelink.ext import spotify
 from wavelink import LavalinkException, LoadTrackError

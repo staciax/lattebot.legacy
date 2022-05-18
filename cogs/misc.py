@@ -5,10 +5,7 @@ import pygit2
 import itertools
 import datetime
 import psutil
-from discord import Interaction
-from discord import ui, Object
-from discord import app_commands
-from discord.ext import commands
+from discord import ui, Object, Interaction, app_commands
 from discord.utils import format_dt, utcnow
 from discord.app_commands.checks import dynamic_cooldown
 from utils.checks import cooldown_5s
@@ -35,7 +32,7 @@ def get_latest_commits(limit: int = 5) -> str:
 class Misc(Cog):
     """Miscellaneous commands"""
 
-    # process = psutil.Process()
+    process = psutil.Process()
 
     @property
     def display_emoji(self) -> discord.Emoji:
@@ -49,7 +46,7 @@ class Misc(Cog):
         latency = self.bot.latency * 1000
         embed = discord.Embed(color=self.bot.theme)
         embed.add_field(name=f"{LATTE_EMOJI.CURSOR} Latency", value=f"```nim\n{round(latency)} ms```")
-        embed.set_footer(text=f'{self.bot.user.name} | v{self.bot.bot_version}')
+        embed.set_footer(text=f'{self.bot.user.name} | v{self.bot.bot_version}', icon_url=self.bot.user.avatar)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name='invite')
@@ -87,23 +84,15 @@ class Misc(Cog):
         """Shows basic information about the bot."""
 
         owner_bot = await self.bot.stacia
-        bot_name = self.bot.user.name
         bot_version = self.bot.bot_version
         server_count = len(self.bot.guilds)
         # member_count = len(self.bot.get_all_members())
+        channel_count = len(list(self.bot.get_all_channels()))
         member_count = 0
         for guild in self.bot.guilds: member_count += guild.member_count
         total_commands = len(self.bot.tree.get_commands())
         # total_commands = len(self.bot.tree._get_all_commands(guild=discord.Object(id=default_guild)))
-
-        #emoji
-        latte_icon = LATTE_EMOJI.LATTE_ICON
-        member_emoji = LATTE_EMOJI.MEMBER
-        bot_cmd = LATTE_EMOJI.BOT_COMMANDS
-        python_icon = LATTE_EMOJI.PYTHON
-        dpy_icon = LATTE_EMOJI.DPY
-        cursor_emoji = LATTE_EMOJI.CURSOR
-        # valorant_icon = LATTE_EMOJI.VALORANT
+        memory_usage = self.process.memory_full_info().uss / 1024 / 1024
 
         embed = discord.Embed(color=self.bot.theme, timestamp=discord.utils.utcnow())
         embed.set_author(name=f"About Me", icon_url=self.bot.user.avatar)
@@ -113,27 +102,23 @@ class Misc(Cog):
         #     value=f"ᴏᴡɴᴇʀ: [{owner_bot}](https://discord.com/users/{owner_bot.id}, '┐(・。・┐) ♪')",
         #     inline=False
         # )
-        embed.add_field(
-            name='ʟᴀᴛᴇꜱᴛ ᴜᴘᴅᴀᴛᴇꜱ:',
-            value=get_latest_commits(5),
-            inline=False
-        )
+        embed.add_field(name='ʟᴀᴛᴇꜱᴛ ᴜᴘᴅᴀᴛᴇꜱ:', value=get_latest_commits(5), inline=False)
         embed.add_field(
             name='ꜱᴛᴀᴛꜱ:',
-            value=f"{latte_icon} ꜱᴇʀᴠᴇʀꜱ: `{server_count}`\n{member_emoji} ᴜꜱᴇʀꜱ: `{member_count}`\n{bot_cmd} ᴄᴏᴍᴍᴀɴᴅꜱ: `{total_commands}`", 
+            value=f"{LATTE_EMOJI.LATTE_ICON} ꜱᴇʀᴠᴇʀꜱ: `{server_count}`\n{LATTE_EMOJI.MEMBER} ᴜꜱᴇʀꜱ: `{member_count}`\n{LATTE_EMOJI.BOT_COMMANDS} ᴄᴏᴍᴍᴀɴᴅꜱ: `{total_commands}`\n{LATTE_EMOJI.CHANNEL} ᴄʜᴀɴɴᴇʟ: `{channel_count}`", 
             inline=True
         )
         embed.add_field(
             name='ʙᴏᴛ ɪɴꜰᴏ:',
-            value=f"{cursor_emoji} ʟɪɴᴇ ᴄᴏᴜɴᴛ: `{(self.bot.line_count('.') + self.bot.line_count('ext/valorant'))}`\n{latte_icon} ʟᴀᴛᴛᴇ_ʙᴏᴛ: `{bot_version}`\n{python_icon} ᴘʏᴛʜᴏɴ: `{platform.python_version()}`\n{dpy_icon} ᴅɪꜱᴄᴏʀᴅ.ᴘʏ: `{discord.__version__}`",
+            value=f"{LATTE_EMOJI.CURSOR} ʟɪɴᴇ ᴄᴏᴜɴᴛ: `{(self.bot.line_count('.') + self.bot.line_count('ext/valorant'))}`\n{LATTE_EMOJI.LATTE_ICON} ʟᴀᴛᴛᴇ_ʙᴏᴛ: `{bot_version}`\n{LATTE_EMOJI.PYTHON} ᴘʏᴛʜᴏɴ: `{platform.python_version()}`\n{LATTE_EMOJI.DPY} ᴅɪꜱᴄᴏʀᴅ.ᴘʏ: `{discord.__version__}`",
             inline=True
         )
         embed.add_field(name='\u200b', value='\u200b', inline=True)
-        embed.add_field(name='ᴘʀᴏᴄᴇꜱꜱ:', value=f"ᴄᴘᴜ ᴜꜱᴀɢᴇ: `{psutil.cpu_percent()}%`\nᴠɪʀᴛᴜᴀʟ ᴍᴇᴍᴏʀʏ: `{psutil.virtual_memory().percent}%`", inline=True)
+        embed.add_field(name='ᴘʀᴏᴄᴇꜱꜱ:', value=f"ᴏꜱ: `{platform.system()}`\nᴄᴘᴜ ᴜꜱᴀɢᴇ: `{psutil.cpu_percent()}%`\nᴍᴇᴍᴏʀʏ ᴜꜱᴀɢᴇ: `{memory_usage:.2f} MB`", inline=True)
         embed.add_field(name='ᴜᴘᴛɪᴍᴇ:', value=f"{self.bot.launch_time}", inline=True)
         embed.add_field(name='\u200b', value='\u200b', inline=True)
 
-        embed.set_footer(text='Made by ꜱᴛᴀᴄɪᴀ.#7475', icon_url=owner_bot.avatar)
+        embed.set_footer(text='ᴍᴀᴅᴇ ʙʏ ꜱᴛᴀᴄɪᴀ.#7475', icon_url=owner_bot.avatar)
 
         # emoji 
         staciax_emoji = str(LATTE_EMOJI.STACIA)
@@ -155,23 +140,18 @@ class Misc(Cog):
         """Sends the support server of the bot."""
 
         owner_bot = await self.bot.stacia
-        bot_avatar = self.bot.user.avatar
-        support_url = self.bot.latte_supprt_url
         support_guild = self.bot.latte_support
-        support_guild_icon = support_guild.icon
-        support_emoji = str(LATTE_EMOJI.LATTE_SUPPORT)
-        stacia_emoji = str(LATTE_EMOJI.STACIA)
 
         embed = discord.Embed(color=self.bot.theme)
         embed.description = f'ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀꜱ: {support_guild.member_count}'
-        embed.set_author(name=f"ꜱᴜᴘᴘᴏʀᴛ ꜱᴇʀᴠᴇʀ:", icon_url=bot_avatar, url=support_url)
-        embed.set_thumbnail(url=support_guild_icon)
+        embed.set_author(name=f"ꜱᴜᴘᴘᴏʀᴛ ꜱᴇʀᴠᴇʀ:", icon_url=self.bot.user.avatar, url=self.bot.latte_supprt_url)
+        embed.set_thumbnail(url=support_guild.icon)
 
         #support@lattebot.xyz
 
         view = ui.View()
-        view.add_item(ui.Button(label='ᴄʟɪᴄᴋ ᴛᴏ ᴊᴏɪɴ', url=support_url, emoji=support_emoji))
-        view.add_item(ui.Button(label='ᴅᴇᴠ', url=f'https://discord.com/users/{owner_bot.id}', emoji=stacia_emoji))
+        view.add_item(ui.Button(label='ᴄʟɪᴄᴋ ᴛᴏ ᴊᴏɪɴ', url= self.bot.latte_supprt_url, emoji=str(LATTE_EMOJI.LATTE_SUPPORT)))
+        view.add_item(ui.Button(label='ᴅᴇᴠ', url=f'https://discord.com/users/{owner_bot.id}', emoji=str(LATTE_EMOJI.STACIA)))
 
         await interaction.response.send_message(embed=embed, view=view)
 

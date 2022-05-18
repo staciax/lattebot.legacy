@@ -24,6 +24,9 @@ from ext.valorant.db import ValorantDB
 
 load_dotenv()
 
+os.environ['JISHAKU_NO_UNDERSCORE'] = 'True'
+os.environ['JISHAKU_HIDE'] = 'True'
+
 class Latte_Bot(commands.AutoShardedBot):
     
     log = logging.getLogger('Latte_bot.logging')
@@ -62,7 +65,8 @@ class Latte_Bot(commands.AutoShardedBot):
             'cogs.infomation',
             'cogs.moderator',
             'cogs.help',
-            'cogs.utility'
+            'cogs.utility',
+            'cogs.errors'
         ]
        
         self.client_id = 894156599906689095
@@ -211,13 +215,13 @@ class Latte_Bot(commands.AutoShardedBot):
             "min_size": 1,
             "max_size": 5
         }
-        # localhost = {
-        #     "user": "postgres",
-        #     "password": "RENLYX9",
-        #     "database": "postgres",
-        #     "host": "localhost",
-        #     "port": "5432"
-        # }
+        localhost = {
+            "user": "postgres",
+            "password": "RENLYX9",
+            "database": "postgres",
+            "host": "localhost",
+            "port": "5432"
+        }
         db = None
         try:
             db = await asyncpg.create_pool(**credentials)
@@ -331,3 +335,7 @@ class Latte_Bot(commands.AutoShardedBot):
         except Exception as e:
             self.log_ext.error(f'Failed to reload extension {name}', exc_info=e)
             raise e
+    
+    async def start(self, dev: bool = False) -> None:
+        TOKEN = os.getenv('DISCORD_TOKEN') if not dev else os.getenv('DISCORD_TOKEN_TEST')
+        return await super().start(TOKEN, reconnect=True)

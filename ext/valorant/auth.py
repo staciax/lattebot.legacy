@@ -275,4 +275,4 @@ class Auth:
         elif authenticate['auth'] == '2fa':
             return {'error': authenticate['message']}
         
-        raise RuntimeError('Not supported 2FA')
+        raise RuntimeError('Not supported 2FA, Please `/login` to register!')

@@ -1,7 +1,6 @@
 import discord
-from discord import Interaction
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, Interaction
 from discord.app_commands.checks import dynamic_cooldown
 from typing import Literal
 

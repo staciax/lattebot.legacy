@@ -1,7 +1,5 @@
 import discord
-from discord import Member, User
-from discord import Interaction
-from discord import app_commands
+from discord import app_commands, Interaction, Member, User
 from discord.app_commands.checks import dynamic_cooldown
 from typing import Union
 

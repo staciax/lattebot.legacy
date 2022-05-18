@@ -151,10 +151,14 @@ class Notifys(commands.Cog):
                             choice_list[name] = skin['uuid']
 
         if not choice_list:
-            popular_skin =(
-            'prime', 'reaver', 'glitchpop', 'rgx', 'spectrum', 'magepunk',
-            'recon', 'sovereign', 'sentinels', 'blastx', 'ion', 'oni'
-        )
+            popular_skin = (
+                'prime', 'reaver', 'glitchpop', 'rgx', 'spectrum', 'magepunk',
+                'recon', 'sovereign', 'sentinels', 'blastx', 'ion', 'oni', 'recon',
+                'elderflame', 'arcane', 'forsaken', 'prime//2.0', 'singularity',
+                "gaia's", "valorant", 'celestial','ruination', 'radiant', 'champions'
+                'protocol','origin', 'prism'
+            )
+
             popular_skin_shuffle = tuple(random.sample(popular_skin, len(popular_skin)))
             return [app_commands.Choice(name=skin['names'][default_language], value=skin['uuid']) for skin in sorted(cache['skins'].values(), key=lambda x: x['names'][default_language]) \
                 if skin['names'][default_language].lower().startswith(popular_skin_shuffle[:2]) and skin['levelone']

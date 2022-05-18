@@ -96,6 +96,7 @@ class LATTE_EMOJI(Enum):
   STACIA = '<:stacia_icon:948850880617250837>'
   MOON = '<:Moon:969409166215102464>'
   RAIDEN = '<:chibiraidensmile:903361022943965215>'
+  CHANNEL = '<:channel_icon:974337282167423046>'
 
   def __str__(self):
     return self.value

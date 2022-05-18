@@ -256,7 +256,7 @@ def fetch_contracts() -> None:
         'b0bd7062-4d62-1ff1-7920-b39622ee926b', # BP EP 3 ACT 2
         'be540721-4d60-0675-a586-ecb14adcb5f7',  # BP EP 3 ACT 3
         '60f2e13a-4834-0a18-5f7b-02b1a97b7adb' # BP EP 4 ACT 1
-        # 'c1cd8895-4bd2-466d-e7ff-b489e3bc3775', # BP EP 4 ACT 2
+        'c1cd8895-4bd2-466d-e7ff-b489e3bc3775', # BP EP 4 ACT 2
     ]
 
     if resp.status_code == 200:

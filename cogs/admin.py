@@ -2,13 +2,14 @@ import discord
 import os
 from discord import app_commands, Interaction, Member, User
 from discord.ext import commands, menus
-from typing import Optional, Union, Dict, List
+from typing import Optional, Union, Dict, List, Literal
 
 from utils import Cog
 from utils.formats import format_dt
 from utils.emojis import LATTE_EMOJI 
 from utils.checks import owner_only
 from utils.menus import LattePage, SimplePageSource
+from utils.latte_guild import LatteSupportVerifyView, LatteVerifyView
 
 latte_admin_guild_id = 965942839563386910
 latte_admin_guild = discord.Object(id=latte_admin_guild_id)
@@ -168,6 +169,64 @@ class Admin(Cog):
     #     embed = discord.Embed(color=toggle_color)
     #     embed.description = f"Successfully {ternary} the `{command.name}` command."
     #     await ctx.maybe_reply(embed=embed)
+
+    @commands.command()
+    @commands.is_owner()
+    async def sync(self, ctx: commands.Context, sync_type: str):
+        
+        ctx.typing()
+        try:
+            if sync_type == 'guild':
+                guild = discord.Object(id=ctx.guild.id)
+                self.bot.tree.copy_global_to(guild=guild)
+                await self.bot.tree.sync(guild=guild)
+                await ctx.reply(f"Synced guild !")
+            elif sync_type == 'global':
+                await self.bot.tree.sync()
+                await ctx.reply(f"Synced global !")
+        except discord.Forbidden:
+            await ctx.send("Bot don't have permission to sync. : https://cdn.discordapp.com/attachments/939097458288496682/950613059150417970/IMG_3279.png")
+        except discord.HTTPException:
+            await ctx.send('Failed to sync.', delete_after=30)
+    
+    @commands.command()
+    @commands.is_owner()
+    async def unsync(self, ctx: commands.Context, sync_type: str):
+
+        if self.bot.owner_id is None:
+            if ctx.author.guild_permissions.administrator != True:
+                await ctx.reply("You don't have **Administrator permission(s)** to run this command!", delete_after=30)
+                return
+
+        ctx.typing()
+        try:
+            if sync_type == 'guild':
+                guild = discord.Object(id=ctx.guild.id)
+                commands = self.bot.tree.get_commands(guild=guild)
+                for command in commands:
+                    self.bot.tree.remove_command(command, guild=guild)
+                await self.bot.tree.sync(guild=guild)
+                await ctx.reply(f"Un-Synced guild !")    
+            elif sync_type == 'global':
+                commands = self.bot.tree.get_commands()
+                for command in commands:
+                    self.bot.tree.remove_command(command)
+                await self.bot.tree.sync()
+                await ctx.reply(f"Un-Synced global !")
+        except discord.Forbidden:
+            await ctx.send("Bot don't have permission to unsync. : https://cdn.discordapp.com/attachments/939097458288496682/950613059150417970/IMG_3279.png")
+        except discord.HTTPException:
+            await ctx.send('Failed to unsync.', delete_after=30)
+
+    @commands.command()
+    @commands.is_owner()
+    async def latte_prepare_verify(self, ctx: commands.Context, guilds: Literal['latte', 'support']):
+        file = discord.File("assets/latte_verify.png", filename='latte-verify.png')
+        if guilds == 'latte':
+            await ctx.send(file=file, view=LatteVerifyView(self.bot))
+        elif guilds == 'support':
+            await ctx.send(file=file, view=LatteSupportVerifyView(self.bot))
+        await ctx.message.delete()
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))

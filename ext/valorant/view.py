@@ -67,7 +67,7 @@ class NumberButton(ui.Button):
     def __init__(self, label: str, custom_id: Union[str, int]) -> None:
         super().__init__(
             label=label,
-            style=discord.enums.ButtonStyle.red,
+            style=ButtonStyle.red,
             custom_id=str(custom_id)
         )
 
@@ -219,7 +219,6 @@ class TwoFA_UI(ui.Modal, title='Two-factor authentication'):
 
             if auth['auth'] == 'response':
                 
-
                 login = await self.db.login(user_id, auth, interaction.guild_id, interaction.locale, self.update)
                 if login['auth']:
                     return await send_embed(f"{self.response.get('SUCCESS')} **{login['player']}!**")
@@ -560,7 +559,6 @@ class BaseBundle(discord.ui.View):
         self.fill_items()
         self.update_button()
         await self.interaction.followup.send(embeds=self.embeds[0], view=self)
-
 
 class AgentInfoView(ui.View):
 

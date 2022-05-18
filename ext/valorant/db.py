@@ -14,16 +14,15 @@ from cryptography.fernet import Fernet
 class ValorantDB:
     _version = 1
 
-    def __init__(self, db: asyncpg.Pool, key: str) -> None:
-        self.db  = db
+    def __init__(self, db: asyncpg.Pool, key: bytes) -> None:
+        self.db = db
         self.key = key
-        self.auth = Auth()
 
-    def encrypt(self, message: str, key: bytes) -> str:
-        return str(Fernet(key).encrypt(message.encode())).split("'")[1]
+    def encrypt(self, message: str) -> str:
+        return str(Fernet(self.key).encrypt(message.encode())).split("'")[1]
 
-    def decrypt(self, token: str, key: bytes) -> bytes:
-        return Fernet(key).decrypt(bytes(token, "utf-8")).decode()
+    def decrypt(self, token: str) -> bytes:
+        return Fernet(self.key).decrypt(bytes(token, "utf-8")).decode()
 
     async def is_login(self, user_id: int, login: bool=False) -> Optional[Dict]:
         
@@ -45,7 +44,7 @@ class ValorantDB:
         response = LocaleErrorResponse('DATABASE', locale_code)
 
         db = self.db
-        auth = self.auth
+        auth = Auth()
         auth.locale_code = locale_code
 
         auth_data = data['data']
@@ -63,8 +62,8 @@ class ValorantDB:
         headers = json.dumps({'Authorization': f'Bearer {access_token}', 'X-Riot-Entitlements-JWT': entitlements_token})
 
         # encrypt data
-        e_headers = self.encrypt(headers, self.key)
-        e_cookies = self.encrypt(cookies, self.key)
+        e_headers = self.encrypt(headers)
+        e_cookies = self.encrypt(cookies)
 
         query_insert = """INSERT INTO valorant.users(
                 user_id, guild_id, puuid, player_name, region, expiry_token, headers, cookies, notify_mode)
@@ -105,22 +104,22 @@ class ValorantDB:
         
     async def refresh_token(self, user_id: int, cookies: Dict, locale_code: str) -> Optional[Dict]:
         
-        auth = self.auth
+        auth = Auth()
         auth.locale_code = locale_code
         
         db = self.db
 
         new_cookie, access_token, entitlements_token, tokenId = auth.redeem_cookies(cookies, locale_code)
 
-        EXP_TOKEN = datetime.timestamp(datetime.utcnow() + timedelta(minutes=59))
+        EXP_TOKEN = datetime.timestamp(datetime.utcnow() + timedelta(minutes=50))
 
         new_header = {'Authorization': f'Bearer {access_token}', 'X-Riot-Entitlements-JWT': entitlements_token}
 
         cookie = json.dumps(new_cookie)
         header = json.dumps(new_header)
 
-        e_cookies = self.encrypt(cookie, self.key)
-        e_headers = self.encrypt(header, self.key)
+        e_cookies = self.encrypt(cookie)
+        e_headers = self.encrypt(header)
 
         query = "UPDATE valorant.users SET expiry_token=$2, headers=$3, cookies=$4 WHERE user_id = $1;"
         await db.execute(query, user_id, EXP_TOKEN, e_headers, e_cookies)
@@ -135,16 +134,13 @@ class ValorantDB:
         region = row['region']
         player_name = row['player_name']
         notify_mode = row['notify_mode']
+        expiry_token = row['expiry_token']
 
         # decrypt data
-        try:
-            headers = self.decrypt(row['headers'], self.key)
-            cookies = self.decrypt(row['cookies'], self.key)
-        except: 
-            headers = row['headers']
-            cookies = row['cookies']
+        headers = self.decrypt(row['headers'])
+        cookies = self.decrypt(row['cookies'])
 
-        if timestamp_utc() > row['expiry_token']:
+        if timestamp_utc() > expiry_token:
             headers = await self.refresh_token(user_id, cookies, locale_code)
 
         data = dict(
@@ -154,7 +150,7 @@ class ValorantDB:
             player_name=player_name,
             notify_mode=notify_mode
         )
-           
+
         return data or None
     
     async def logout(self, user_id: int, locale_code: str) -> None:
@@ -174,7 +170,7 @@ class ValorantDB:
     async def cookie_login(self, user_id: int, input_cookie: str, guild_id:str, locale_code: str) -> Optional[Dict]:
         db = self.db
 
-        auth = self.auth
+        auth = Auth()
         data = auth.login_with_cookie(input_cookie, locale_code)
 
         cookie = data['cookies']
