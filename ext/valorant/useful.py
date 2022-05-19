@@ -342,7 +342,7 @@ class GetFormat:
             price = *offer['Offer']['Cost'].values(),
             Disprice = *offer['DiscountCosts'].values(),
             
-            uuid = offer['Offer']['ID']
+            uuid = offer['Offer']['OfferID']
             skin = GetItem.get_skin(uuid)
             name = skin['names'][language]
             icon = skin['icon']

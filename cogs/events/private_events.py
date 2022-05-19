@@ -20,7 +20,7 @@ class PrivateEvents(EventsBase):
         
         embed = discord.Embed(title='ᴊᴏɪɴᴇᴅ ꜱᴇʀᴠᴇʀ', color=0xffffff, timestamp=discord.utils.utcnow(),
                             description=f'**ɴᴀᴍᴇ:** {discord.utils.escape_markdown(guild.name)} • {guild.id}'
-                            f'\n**ᴏᴡɴᴇʀ:** {guild.owner} • {guild.owner_id}')
+                            f'\n**ᴏᴡɴᴇʀ:** {guild.owner_id}')
                                    
         embed.add_field(name='ᴍᴇᴍʙᴇʀ ᴄᴏᴜɴᴛ', value=f'{guild.member_count}', inline=True)
         embed.add_field(name='ᴄʀᴇᴀᴛɪᴏɴ ᴅᴀᴛᴇ', value=f'{format_dt(guild.created_at)}', inline=True)
@@ -35,7 +35,7 @@ class PrivateEvents(EventsBase):
         
         embed = discord.Embed(title='ʟᴇꜰᴛ ꜱᴇʀᴠᴇʀ', color=0xffffff, timestamp=discord.utils.utcnow(),
                             description=f'**ɴᴀᴍᴇ:** {discord.utils.escape_markdown(guild.name)} • {guild.id}'
-                            f'\n**ᴏᴡɴᴇʀ:** {guild.owner} • {guild.owner_id}')
+                            f'\n**ᴏᴡɴᴇʀ:** {guild.owner_id}')
                                    
         embed.add_field(name='ᴍᴇᴍʙᴇʀ ᴄᴏᴜɴᴛ', value=f'{guild.member_count}', inline=True)
         embed.add_field(name='ᴄʀᴇᴀᴛɪᴏɴ ᴅᴀᴛᴇ', value=f'{format_dt(guild.created_at)}', inline=True)
