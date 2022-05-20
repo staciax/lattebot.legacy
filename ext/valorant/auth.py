@@ -206,6 +206,8 @@ class Auth:
         # # LOAD COOKIE
         cookies = json.loads(cookies)
 
+        old_cookie = cookies['cookie']
+
         session = requests.session()
         r = session.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
@@ -220,7 +222,9 @@ class Auth:
 
         # NEW COOKIE
         cookies = {}
-        cookies['cookie'] = r.cookies.get_dict()
+        cookies['cookie'] = old_cookie
+        for cookie in r.cookies.items():
+            cookies['cookie'][cookie[0]] = cookie[1]
 
         accessToken, tokenId = extract_tokens_from_url(r.text, locale_code)
         entitlements_token = self.get_entitlements_token(accessToken)
