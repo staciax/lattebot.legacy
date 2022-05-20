@@ -28,6 +28,54 @@ queues: list = [
     "null"
 ]
 
+Queues ={
+    "competitive": {
+        "name": "Competitive",
+        "icon": "https://media.valorant-api.com/gamemodes/96bd3920-4f36-d026-2b28-c683eb0bcac5/displayicon.png",
+        "emoji": "<:competitive:974285304347381791>"
+    },
+    "custom": {
+        "name": "Custom",
+        "icon": "https://media.valorant-api.com/gamemodes/96bd3920-4f36-d026-2b28-c683eb0bcac5/displayicon.png",
+        "emoji": "<:custom:974285304347381791>"
+    },
+    "deathmatch": {
+        "name": "Deathmatch",
+        "icon": "https://media.valorant-api.com/gamemodes/a8790ec5-4237-f2f0-e93b-08a8e89865b2/displayicon.png",
+        "emoji": "<:deathmatch:974285400216588328>"
+    },
+    "ggteam": {
+        "name": "Escalation",
+        "icon": "https://media.valorant-api.com/gamemodes/a4ed6518-4741-6dcb-35bd-f884aecdc859/displayicon.png",
+        "emoji": "<:ggteam:974285387193270363>"
+    },
+    "snowball": {
+        "name": "Snowball Fight",
+        "icon": "https://media.valorant-api.com/gamemodes/57038d6d-49b1-3a74-c5ef-3395d9f23a97/displayicon.png",
+        "emoji": "<:snowball:974285343144701992>"
+    },
+    "spikerush": {
+        "name": "Spike Rush",
+        "icon": "https://media.valorant-api.com/gamemodes/e921d1e6-416b-c31f-1291-74930c330b7b/displayicon.png",
+        "emoji": "<:spikerush:974285330133942292>"
+    },
+    "unrated": {
+        "name": "Unrated",
+        "icon": "https://media.valorant-api.com/gamemodes/96bd3920-4f36-d026-2b28-c683eb0bcac5/displayicon.png",
+        "emoji": "<:unrated:974285304347381791>"
+    },
+    "onefa": {
+        "name": "Replication",
+        "icon": "https://media.valorant-api.com/gamemodes/4744698a-4513-dc96-9c22-a9aa437e4a58/displayicon.png",
+        "emoji": "<:onefa:974285373805051904>"
+    },
+    "null": {
+        "name": None,
+        "icon": None,
+        "emoji": None
+    },
+}
+
 class QueueID(Enum):
     COMPETITIVE = 'competitive'
     CUSTOM = 'custom'
@@ -158,6 +206,46 @@ maps: dict = {
     '/Game/Maps/Port/Port': 'Icebox',
     '/Game/Maps/Triad/Triad': 'Haven',
     '/Game/Maps/Poveglia/Range': 'The Range'
+}
+
+RANKS = {
+    '0': {'name': 'Unranked', 'emoji': '<:unranked:950360601991970866>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/0/largeicon.png'},
+    '1': {'name': 'Unused1', 'emoji': None, 'icon': None},
+    '2': {'name': 'Unused2', 'emoji': None, 'icon': None},
+    '3': {'name': 'Iron 1', 'emoji': '<:iron1:950360602444988427>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/3/largeicon.png'},
+    '4': {'name': 'Iron 2', 'emoji': '<:iron2:950360603405463593>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/4/largeicon.png'},
+    '5': {'name': 'Iron 3', 'emoji': '<:iron3:950360604491792424>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/5/largeicon.png'},
+    '6': {'name': 'Bronze 1', 'emoji': '<:bronze1:950360605443895306>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/6/largeicon.png'},
+    '7': {'name': 'Bronze 2', 'emoji': '<:bronze2:950360605867528216>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/7/largeicon.png'},
+    '8': {'name': 'Bronze 3', 'emoji': '<:bronze3:950360606836408340>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/8/largeicon.png'},
+    '9': {'name': 'Silver 1', 'emoji': '<:silver1:950360607713009694>', 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/9/largeicon.png'},
+    '10': {'name': 'Silver 2', 'emoji': '<:silver2:950360608002437191>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/10/largeicon.png'}, 
+    '11': {'name': 'Silver 3', 'emoji': '<:silver3:950360611391418428>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/11/largeicon.png'},
+    '12': {'name': 'Gold 1', 'emoji': '<:gold1:950360617246683146>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/12/largeicon.png'},
+    '13': {'name': 'Gold 2', 'emoji': '<:gold2:950360618093924462>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/13/largeicon.png'},
+    '14': {'name': 'Gold 3', 'emoji': '<:gold3:950360619062804540>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/14/largeicon.png'},
+    '15': {'name': 'Platinum 1', 'emoji': '<:platinum1:950360619717103627>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/15/largeicon.png'},
+    '16': {'name': 'Platinum 2', 'emoji': '<:platinum2:950360621097037874>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/16/largeicon.png'},
+    '17': {'name': 'Platinum 3', 'emoji': '<:platinum3:950360621772341258>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/17/largeicon.png'},
+    '18': {'name': 'Diamond 1', 'emoji': '<:diamond1:950360622502137856>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/18/largeicon.png'},
+    '19': {'name': 'Diamond 2', 'emoji': '<:diamond2:950360623420674048>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/19/largeicon.png'},
+    '20': {'name': 'Diamond 3', 'emoji': '<:diamond3:950360624460857395>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/20/largeicon.png'},
+    '21': {'name': 'Immortal 1', 'emoji': '<:immortal1:950360625882738708>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/21/largeicon.png'},
+    '22': {'name': 'Immortal 2', 'emoji': '<:immortal2:950360627111673916>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/22/largeicon.png'},
+    '23': {'name': 'Immortal 3', 'emoji': '<:immortal3:950360628172845106>' , 'icon': 'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/23/largeicon.png'},
+    '24': {'name': 'Radiant', 'emoji': '<:radiant:950362888055447562>', 'icon':'https://media.valorant-api.com/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda/24/largeicon.png'}
+}
+
+EmojiResult = {
+    'EliminationLoss': '<:eliminationloss1:973507436260519936>',
+    'DefuseLoss': '<:diffuseloss1:973507436063359017>',
+    'DetonateLoss': '<:explosionloss1:973507436231131156>',
+    'EliminationWin': '<:eliminationwin1:973507436373757952>',
+    'DefuseWin': '<:diffusewin1:973507436013043773>',
+    'DetonateWin': '<:explosionwin1:973507435891400705>',
+    'Win': '<:timewin1:973507436264710144>',
+    'Loss': '<:timeloss1:973507436319219782>',
+    'Surrendered': '<:EarlySurrender_Flag:974236955544018945>',
 }
 
 class MapID(Enum):

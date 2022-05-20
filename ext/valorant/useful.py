@@ -1,8 +1,20 @@
+from __future__ import annotations
+
 import json
 import os
 import contextlib
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Any, Optional, TYPE_CHECKING
 from datetime import datetime
+from utils.formats import deltaconv
+
+if TYPE_CHECKING:
+    from .api import VALORANT_ENDPOINT as Endpoint
+
+current_season = '3e47230a-463c-a301-eb7d-67bb60357d4f'
+
+def percent(*args: Optional[List[int]]) -> Optional[List]: 
+    t = sum(args) 
+    return [100 * y / t for y in args] 
 
 # ---------- TIME UTILS ---------- #
 
@@ -31,6 +43,19 @@ class JSON:
                 json.dump(formats, fp, indent=2)
 
     @classmethod
+    def ext_read(cls, filename: str, force=True) -> Dict:
+        '''Read json file'''
+        try:
+            with open("ext/valorant/ext_data/" + filename + ".json", "r", encoding='utf-8') as json_file:
+                data = json.load(json_file)
+        except FileNotFoundError:
+            if force:
+                cls.create(filename, {})
+                return cls.read(filename, force=False)
+        return data
+
+
+    @classmethod
     def read(cls, filename: str, force=True) -> Dict:
         '''Read json file'''
         try:
@@ -53,6 +78,20 @@ class JSON:
             return cls.save(filename, data)
 
 # ---------- GET DATA ---------- #
+
+class GetData:
+
+    def cache() -> Dict:
+        """Get cache from data"""
+        return JSON.read('cache')
+
+    @classmethod
+    def agent(cls, uuid: str = None) -> Dict:
+        """Get agent data"""
+        data = JSON.ext_read('agents')
+        if uuid is None:
+            return data['agents']
+        return data['agents'][uuid]
 
 class GetItem:
     
@@ -572,6 +611,521 @@ class GetFormat:
         #     print(skin['ItemID'])
 
         return loadout
+
+    def death_match(match: Dict, endpoint: Endpoint) -> Dict:
+        """Get death match data"""
+
+        from .resources import Queues, RANKS, maps as Maps
+
+        AgentsData = GetData.agent()
+
+        puuid = match['your_puuid']
+        map_id = match['MapID']
+        map_name = Maps[map_id]
+        playdate = match['playdate']
+        gamelength = deltaconv(match['gamelength'] / 1000 / 60)
+        queueID = match['queueID']
+        your_agent = AgentsData[match['your_agent']]
+        your_name = match['your_name']
+        player_won = match['won']
+
+        color = 0x60dcc4 if puuid == player_won else 0xfc5c5c
+        result_text = 'VICTORY' if puuid == player_won else 'DEFEAT'
+        queue_emoji = Queues[queueID]['emoji'] if queueID in Queues else Queues['unrated']['emoji']
+
+        players = []
+        player_score = []
+        player_kda = []
+        player_rank = []
+        player_agents = []
+
+        highest_kill = 0
+        your_kill = 0
+        second_kill = 0
+
+        AgentsData = GetData.agent()
+        for index, player in enumerate(sorted(match['player'].values(), key=lambda x: x['stats']['score'], reverse=True), start=1):
+            
+            locale_code = 'en-US'
+            player_puuid = player['puuid']
+
+            mmr = endpoint.fetch_player_mmr(player_puuid)
+            try:
+                rank = mmr['QueueSkills']['competitive']['SeasonalInfoBySeasonID'][current_season]['Rank']
+            except (TypeError, KeyError):
+                rank = 0
+
+            stats = player['stats']
+            kill = stats['kills']
+            death = stats['deaths']
+            assist = stats['assists']
+            score = stats['score']
+            agent_uuid = player['agent_uuid']
+            rank_emoji = RANKS[str(rank)]['emoji']
+            player_name = player['player'] if player['player'] != your_name else f'**{player["player"]}**'
+
+            player_agent = AgentsData[agent_uuid]
+            AgentEmoji = player_agent['emoji']
+
+            # label = f"{AgentEmoji} {rank_emoji} {player_name}"
+            SCORE = f"{int(score)}"
+            KDA = f"{kill}/{death}/{assist}"
+            if index == 1:
+                highest_kill = kill
+                SCORE += ' <:TX_Icon_MVPStar:973844286552543242>'
+            if index == 2:
+                second_kill = kill
+
+            if player_puuid == puuid:
+                your_kill = kill
+
+            players.append(player_name)
+            player_agents.append(AgentEmoji)
+            player_rank.append(rank_emoji)
+            player_score.append(SCORE)
+            player_kda.append(KDA)
+
+        return dict(
+            map=map_name,
+            highest=highest_kill,
+            second=second_kill,
+            your_kill=your_kill,
+            match_result=result_text,
+            playdate=playdate,
+            gamelength=gamelength,
+            queue_id=queueID,
+            queue_emoji=queue_emoji,
+            your_name=your_name,
+            your_agent=your_agent,
+            color=color,
+            players=players,
+            player_score=player_score,
+            player_kda=player_kda,
+            player_rank=player_rank,
+            player_agents=player_agents
+        )
+
+    def match_result(match: Dict, endpoint: Any) -> Dict:
+        from .resources import Queues, RANKS, maps as Maps
+            
+        map_id = match['MapID']
+        map_name = Maps[map_id]
+        playdate = match['playdate']
+        playdatetime = (datetime.fromtimestamp(playdate)).strftime('%#d %b %Y')
+        gamelength = deltaconv(match['gamelength'] / 1000 / 60)
+        queueID = match['queueID']
+        your_team = match['your_team']
+        your_agent = match['your_agent']
+        your_rank = match['your_rank']
+        your_KDA = match['your_KDA']
+        your_name = match['your_name']
+        won = match['won']
+        winner_score = match['winner_score']
+        loser_score = match['loser_score']
+        match_score = f'{winner_score}:{loser_score}' if your_team == won else f'{loser_score}:{winner_score}'
+        color = 0x60dcc4 if your_team == won else 0xfc5c5c
+        result_text = 'VICTORY' if your_team == won else 'DEFEAT'
+        timelines = match['timelines']
+        queue_emoji = Queues[queueID]['emoji'] if queueID in Queues else Queues['unrated']['emoji']
+
+        your_abilities = ''
+        your_agent = {}
+
+        # TEAM A
+        TEAM_A_Player = []
+        TEAM_A_RANK = []
+        TEAM_A_ACS = []
+        TEAM_A_KDA = []
+        TEAM_A_HS_PERCENT = []
+        TEAM_A_KILL_DEL_DEATH = []
+        TEAM_A_FIRST_BLOOD = []
+
+        # TEAM B
+        TEAM_B_Player = []
+        TEAM_B_RANK = []
+        TEAM_B_ACS = []
+        TEAM_B_KDA = []
+        TEAM_B_HS_PERCENT = []
+        TEAM_B_KILL_DEL_DEATH = []
+        TEAM_B_FIRST_BLOOD = []
+        
+        OPPONENT = []
+        OPPONENT_KDA = []
+
+        AgentsData = GetData.agent()
+        for index, player in enumerate(sorted(match['player'].values(), key=lambda x: x['stats']['score'], reverse=True), start=1):
+
+            locale_code = 'en-US'
+            puuid = player['puuid']
+            stats = player['stats']
+            damage = stats['damage']
+            ability = stats['ability']
+            kill = stats['kills']
+            death = stats['deaths']
+            assist = stats['assists']
+            score = stats['score']
+            rounds = stats['rounds']
+
+            agent_uuid = player['agent_uuid']
+            headshot = damage['headshots']
+            bodyshot = damage['bodyshots']
+            legshot = damage['legshots']
+            first_blood = stats['firstkills']
+            player_name = player['player'] if player['player'] != your_name else f'**{player["player"]}**'
+            
+            rank = player['rank_tier']
+            if queueID == 'custom':
+                mmr = endpoint.fetch_player_mmr(puuid)
+                try:
+                    rank = mmr['QueueSkills']['competitive']['SeasonalInfoBySeasonID'][current_season]['Rank']
+                except (TypeError):
+                    rank = rank
+
+            rank_emoji = RANKS[str(rank)]['emoji']
+            player_agent = AgentsData[agent_uuid]
+            AgentName = player_agent['names'][locale_code]
+            AgentEmoji = player_agent['emoji']
+
+            label = f"{AgentEmoji} {rank_emoji} {player_name}"
+
+            FK = f"{first_blood}"
+            ACS = f"{int(score / rounds)}"
+            KDA = f"{kill}/{death}/{assist}"
+            if index == 1: ACS += ' <:TX_Icon_MVPStar:973844286552543242>'
+
+            try:
+                HS_Percent, BS_Percent, LEG_percent = percent(headshot, bodyshot, legshot)
+            except ZeroDivisionError:
+                HS_Percent, BS_Percent, LEG_percent = 0, 0, 0
+
+            kill_del_death = f'{kill - death}'
+
+            if player['team'] == "Blue":
+                TEAM_A_Player.append(label)
+                TEAM_A_RANK.append(rank_emoji)
+                TEAM_A_ACS.append(ACS)
+                TEAM_A_KDA.append(KDA)
+                TEAM_A_HS_PERCENT.append(f'{HS_Percent:.1f}%')
+                TEAM_A_KILL_DEL_DEATH.append(kill_del_death)
+                TEAM_A_FIRST_BLOOD.append(FK)
+            elif player['team'] == "Red":
+                TEAM_B_Player.append(label)
+                TEAM_B_RANK.append(rank_emoji)
+                TEAM_B_ACS.append(ACS)
+                TEAM_B_KDA.append(KDA)
+                TEAM_B_HS_PERCENT.append(f'{HS_Percent:.1f}%')
+                TEAM_B_KILL_DEL_DEATH.append(kill_del_death)
+                TEAM_B_FIRST_BLOOD.append(FK)
+
+            if your_team != player['team']:
+                OPPONENT.append(label)
+                OPPONENT_KDA.append('0 / 0 / 0')
+
+            if your_name == player['player']:
+                
+                your_agent = player_agent
+
+                if not queueID in ['ggteam', 'deathmatch']:
+
+                    # player
+                    p_grenade = round(ability['grenade'] / rounds, 1)
+                    p_ability1 = round(ability['ability1'] / rounds, 1)
+                    p_ability2 = round(ability['ability2'] / rounds, 1)
+                    p_ultimate = round(ability['ultimate'] / rounds, 1)
+
+                    # agent abilities emoji
+                    emoji_grenade = player_agent['abilities']['Grenade']['emoji']
+                    emoji_ability1 = player_agent['abilities']['Ability1']['emoji']
+                    emoji_ability2 = player_agent['abilities']['Ability2']['emoji']
+                    emoji_ultimate = player_agent['abilities']['Ultimate']['emoji']
+
+                    your_abilities = f'{emoji_grenade} {p_grenade} {emoji_ability1} {p_ability1} {emoji_ability2} {p_ability2} {emoji_ultimate} {p_ultimate}'
+
+        return dict(
+            map_id=map_id,
+            map=map_name,
+            match_score=match_score,
+            match_result=result_text,
+            won=won,
+            winner_score=winner_score,
+            loser_score=loser_score,
+            playdate=playdate,
+            playtime=playdatetime,
+            gamelength=gamelength,
+            queue_id=queueID,
+            queue_emoji=queue_emoji,
+            your_name=your_name,
+            your_abilities=your_abilities,
+            your_agent=your_agent,
+            your_team=your_team,
+            your_rank=your_rank,
+            your_KDA=your_KDA,
+            color=color,
+            timelines=timelines,
+            opponent=OPPONENT,
+            opponent_kda=OPPONENT_KDA,
+            team_a=dict(
+                player=TEAM_A_Player,
+                rank=TEAM_A_RANK,
+                acs=TEAM_A_ACS,
+                kda=TEAM_A_KDA,
+                hs_percent=TEAM_A_HS_PERCENT,
+                kill_del_death=TEAM_A_KILL_DEL_DEATH,
+                first_blood=TEAM_A_FIRST_BLOOD
+            ),
+            team_b=dict(
+                player=TEAM_B_Player,
+                rank=TEAM_B_RANK,
+                acs=TEAM_B_ACS,
+                kda=TEAM_B_KDA,
+                hs_percent=TEAM_B_HS_PERCENT,
+                kill_del_death=TEAM_B_KILL_DEL_DEATH,
+                first_blood=TEAM_B_FIRST_BLOOD
+            )
+        )
+
+    def match_details(puuid:str, match_details: Dict) -> str:
+        """ the match details """
+
+        from .resources import EmojiResult
+
+
+        JSON.save('match_details', match_details)
+
+        matchInfo = match_details['matchInfo']
+
+        matchId = matchInfo['matchId']
+        MapId = matchInfo['mapId']
+        gameLengthMillis = matchInfo['gameLengthMillis']
+        playdate = matchInfo['gameStartMillis'] / 1000
+        queueID = matchInfo['queueID']
+        seasonId = matchInfo['seasonId']
+
+        if matchInfo['provisioningFlowID'] == 'CustomGame':
+            queueID = 'custom'
+
+        # match_details
+
+        # score
+        winner = ''
+        winner_score = 0
+        loser = ''
+        loser_score = 0
+        teams = match_details['teams']
+        for team in teams:
+            if team['won'] is True:
+                winner = team['teamId']
+                winner_score = team['roundsWon']
+            else:
+                loser = team['teamId']
+                loser_score = team['roundsWon']
+
+        matcah_results = {}
+        player_stats = {}
+        blueteam_uuid = []
+        redteam_uuid = []
+
+        your_team = ''
+        your_agent = ''
+        your_rank = 0
+        your_KDA = ''
+
+        blue_loadout = 0
+        blue_spent = 0
+        blue_remaining = 0
+
+        red_loadout = 0
+        red_spent = 0
+        red_remaining = 0   
+        
+        # builds_stats 
+        for player in match_details['players']:
+            player_subject = player['subject']
+            player_stats[player_subject] = {
+                'puuid': player_subject,
+                'team': '',
+                'player': '',
+                # 'agent': get_agent(player['characterId']),
+                'agent_uuid': '',
+                'rank_tier': '',
+                'playercard_uuid': '',
+                'title_uuid': '',
+                'level': '',
+                'stats': {
+                    'kills': 0,
+                    'deaths': 0,
+                    'assists': 0,
+                    'score': 0,
+                    'rounds': 0,
+                    'loadoutValue': 0,
+                    'firstkills': 0,
+                    'firstdeaths': 0,
+                    'spent': 0,
+                    'multikills': 0,
+                    'plants': 0,
+                    'defuses': 0,
+                    'playtimeMillis': 0,
+                    'ability' : {},
+                    'damage': {
+                        'total': 0,
+                        'headshots': 0,
+                        'bodyshots': 0,
+                        'legshots': 0,
+                    }
+                }
+            }
+
+        for player in match_details['players']:
+            player_subject = player['subject']
+        
+            player_team_id = player['teamId']
+            if player_team_id == 'Blue':
+                blueteam_uuid.append(player_subject)
+            else:
+                redteam_uuid.append(player_subject)
+
+            player_stats_insert = player_stats[player_subject]
+
+            stats = player['stats']
+            abilityCasts = stats.get('abilityCasts', None)
+
+            # insert player stats
+            agent_uuid = player['characterId']
+            player_team_id = player['teamId']
+            player_competitiveTier = player['competitiveTier']
+            player_card = player['playerCard']
+            player_title = player['playerTitle']
+            player_name =  player['gameName'] + '#' + player['tagLine']
+            player_level = player['accountLevel']
+            player_kill = stats['kills']
+            player_death = stats['deaths']
+            player_assist = stats['assists']
+            player_score = stats['score']
+            player_rounds = stats['roundsPlayed']
+            player_playtimeMillis = stats['playtimeMillis']
+
+            if player_subject == puuid:
+                your_name = player_name
+                your_agent = agent_uuid
+                your_team = player_team_id
+                your_rank = player_competitiveTier
+                your_KDA = f'{player_kill}/{player_death}/{player_assist}'
+            
+            player_stats_insert['team'] = player_team_id
+            player_stats_insert['player'] = player_name
+            player_stats_insert['agent_uuid'] = agent_uuid
+            player_stats_insert['rank_tier'] = player_competitiveTier
+            player_stats_insert['playercard_uuid'] = player_card
+            player_stats_insert['title_uuid'] = player_title
+            player_stats_insert['level'] = player_level
+            player_stats_insert['stats']['kills'] = player_kill
+            player_stats_insert['stats']['deaths'] = player_death
+            player_stats_insert['stats']['assists'] = player_assist
+            player_stats_insert['stats']['score'] = player_score
+            player_stats_insert['stats']['rounds'] = player_rounds
+            player_stats_insert['stats']['playtimeMillis'] = player_playtimeMillis
+            if abilityCasts is not None:
+                player_stats_insert['stats']['ability'] = {
+                    'grenade': abilityCasts['grenadeCasts'],
+                    'ability1': abilityCasts['ability1Casts'],
+                    'ability2': abilityCasts['ability2Casts'],
+                    'ultimate': abilityCasts['ultimateCasts'],
+                }
+
+        timelines = []
+
+        is_surrendered = False
+        for result in match_details['roundResults']:
+            
+            round_result_code = result['roundResultCode']
+            if round_result_code == 'Surrendered' and is_surrendered is False:
+                emoji = EmojiResult.get('Surrendered', '')
+                is_surrendered = True
+            elif result['winningTeam'] == your_team:
+                emoji = EmojiResult.get(round_result_code + 'Win', '')
+            else:
+                emoji = EmojiResult.get(round_result_code + 'Loss', '')
+                        
+            timelines.append(emoji)
+            if result['roundNum'] == 11 and is_surrendered is False:
+                timelines.append(' | ')
+
+            # bombPlanter
+            round_planter = result.get('bombPlanter', None)
+            if round_planter is not None:
+                player_stats[round_planter]['stats']['plants'] += 1
+            
+            # bombDefuser
+            round_defuse = result.get('bombDefuser', None)
+            if round_defuse is not None:
+                player_stats[round_defuse]['stats']['defuses'] += 1
+
+            first_death = []
+            for player in result['playerStats']:
+                subject = player['subject']
+                for dmg in player['damage']:
+                    player_stats[subject]['stats']['damage']['total'] += dmg.get('damage', 0)
+                    player_stats[subject]['stats']['damage']['headshots'] += dmg.get('headshots', 0)
+                    player_stats[subject]['stats']['damage']['bodyshots'] += dmg.get('bodyshots', 0)
+                    player_stats[subject]['stats']['damage']['legshots'] += dmg.get('legshots', 0)
+                
+                for kill in player['kills']:
+                    first_death.append({
+                        'killer': kill['killer'],
+                        'victim': kill['victim'],
+                        'roundTime': kill['roundTime'],
+                    })
+
+                if len(player['kills']) >= 3:
+                    player_stats[subject]['stats']['multikills'] += 1
+            
+            if len(first_death) != 0:
+                first_blood = sorted(first_death, key=lambda x: x['roundTime'])[0]
+                first_kill = first_blood['killer']
+                first_death = first_blood['victim']
+                player_stats[first_kill]['stats']['firstkills'] += 1
+                player_stats[first_death]['stats']['firstdeaths'] += 1
+
+            # for player_eco in result['playerEconomies']:
+            #     subject_eco = player_eco['subject']
+
+            #     eco_stats = player_stats[subject_eco]
+            #     eco_stats['stats']['loadoutValue'] += player_eco['loadoutValue']
+            #     eco_stats['stats']['spent'] += player_eco['spent']
+
+            #     player_team = eco_stats['team']
+            #     if player_team == 'Blue':
+            #         blue_loadout += player_eco['loadoutValue']
+            #         blue_spent += player_eco['spent']
+            #         blue_remaining += player_eco['remaining']
+            #     elif player_team == 'Red':
+            #         red_loadout += player_eco['loadoutValue']
+            #         red_spent += player_eco['spent']
+            #         red_remaining += player_eco['remaining']
+
+        match_results = dict(
+            MatchID=matchId,
+            MapID=MapId,
+            playdate=playdate,
+            queueID=queueID,
+            gamelength=gameLengthMillis,
+            your_puuid=puuid,
+            your_name=your_name,
+            your_team=your_team,
+            your_agent=your_agent,
+            your_rank=your_rank,
+            your_KDA=your_KDA,
+            won=winner,
+            loser=loser,
+            winner_score=winner_score,
+            loser_score=loser_score,
+            rounds=winner_score + loser_score,
+            blueteam=blueteam_uuid,
+            redteam=redteam_uuid,
+            player=player_stats,
+            timelines=timelines
+        )
+        return match_results
 
 # USEFUL
 

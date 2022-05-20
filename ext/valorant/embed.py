@@ -1,9 +1,10 @@
 import discord
 import contextlib
+import itertools
 from datetime import datetime, timedelta
-from .resources import points, tiers
+from .resources import points, tiers, Queues
 from utils.formats import format_dt, format_relative
-from typing import Union, Dict, List, Any, Optional
+from typing import Union, Dict, List, Any, Optional, Tuple
 
 # if TYPE_CHECKING:
 from .useful import calculate_level_xp, iso_to_time, GetFormat, JSON
@@ -14,6 +15,178 @@ class Embed(discord.Embed): # Custom Embed
         super().__init__(description=description, color=color, **kwargs)
 
 class Generate_Embed:
+
+    def death_match(match: Dict, endpoint: Any) -> List[discord.Embed]:
+
+        result = GetFormat.death_match(match, endpoint)
+        color = result['color']
+        highest = result['highest']
+        second = result['second']
+        your_kill = result['your_kill']
+        match_result = result['match_result']
+        playdate = result['playdate']
+        gamelength = result['gamelength']
+        queue_id = result['queue_id']
+        queue_emoji = result['queue_emoji']
+        your_name = result['your_name']
+        your_agent = result['your_agent']
+        match_result_text = result['match_result']
+
+        players = result['players']
+        player_score = result['player_score']
+        player_kda = result['player_kda']
+        player_rank = result['player_rank']
+        player_agents = result['player_agents']
+
+        footer = {"text": f"{match_result_text}"}
+        author = {"name": f"{your_name} - {queue_id.capitalize()}", "icon_url": your_agent['icon']['icon']}
+
+        embed = discord.Embed(color=color)
+        embed.set_author(**author)
+        embed.add_field(name='Player', value='\n'.join([' '.join(x) for x in itertools.zip_longest(player_agents, player_rank, players)]))
+        embed.add_field(name='SCORE', value='\n'.join(player_score))
+        embed.add_field(name='KDA', value='\n'.join(player_kda))
+        embed.set_footer(**footer)
+        
+        embed_c = discord.Embed(color=color)
+        embed_c.set_author(**author)
+        embed_c.set_footer(**footer)
+        for member, score, kda, rank, agent in zip(players, player_score, player_kda, player_rank, player_agents):
+            embed_c.add_field(name=f"{agent}{rank} {member}", value=f'Score: {score}\nKDA: {kda}')
+
+        
+        return [embed], [embed_c]
+
+    def match_result(puuid, match_result: str, queue_id:str, endpoint: Any) -> List[discord.Embed]:
+        
+        match_details = GetFormat.match_details(puuid, match_result)
+
+        if queue_id == "deathmatch":
+            return Generate_Embed.death_match(match_details, endpoint)
+        
+        result = GetFormat.match_result(match_details, endpoint)
+        return Generate_Embed.build_match(result)
+
+    def build_match(result: Dict) -> Tuple[List[discord.Embed], List[discord.Embed]]:
+        
+        color = result['color']
+        match_score = result['match_score']
+        playdate = result['playdate']
+        playtime = result['playtime']
+        match_result_text = result['match_result']
+        gamelength = result['gamelength']
+        queue_id = result['queue_id']
+        map_name = result['map']
+        queue_emoji = result['queue_emoji']
+        timelines = result['timelines']
+        your_name = result['your_name']
+        your_abilities = result['your_abilities']
+        your_agent = result['your_agent']
+
+        team_a = result['team_a']
+        team_b = result['team_b']
+        opponent = result['opponent']
+        opponent_kda = result['opponent_kda']
+
+        footer = {"text": f"{match_result_text}"}
+        author = {"name": f"{your_name} - {Queues[queue_id]['name']}", "icon_url": your_agent['icon']['icon']}
+        # footer = {"text": f"{gamelength} • {queue_id.capitalize()}"}
+        # footer = {"text": f"{playtime} • {queue_id.capitalize()} • {gamelength}"}
+        timestamp = datetime.fromtimestamp(playdate)
+
+        # TEAM A
+        embed = discord.Embed(color=color, timestamp=timestamp) 
+        # embed.set_author(name=f'{queue_emoji} {map_name} {match_score}')
+        embed.set_author(**author)
+        embed.title =  f'{queue_emoji} {map_name} - {match_score}'
+        embed.add_field(name='TEAM A', value='\n'.join(team_a['player']))
+        embed.add_field(name='ACS', value='\n'.join(team_a['acs']))
+        embed.add_field(name='KDA', value='\n'.join(team_a['kda']))
+
+        # TEAM B
+        embed.add_field(name='TEAM B', value='\n'.join(team_b['player']))
+        embed.add_field(name='ACS', value='\n'.join(team_b['acs']))
+        embed.add_field(name='KDA', value='\n'.join(team_b['kda']))
+
+        if len(timelines) >= 24:
+            embed.add_field(name='Timeline:', value=''.join(timelines[:24]), inline=False)
+            embed.add_field(name=''.join(timelines[24:]), value='\u200b', inline=False)
+        else:
+            embed.add_field(name='Timeline:', value=''.join(timelines), inline=False)
+        embed.set_footer(**footer)
+
+        # ------ PAGE 2 ------ #
+        
+        embed2 = discord.Embed(color=color, timestamp=timestamp)
+        embed2.title = f'{queue_emoji} {map_name} - {match_score}'
+        embed2.set_author(**author)
+        # embed2.set_author(name=f'{queue_emoji} {map_name} {match_score}')
+        embed2.set_footer(**footer)
+        
+        # TEAM A
+        embed2.add_field(name='TEAM A', value='\n'.join(team_a['player']))
+        embed2.add_field(name='FK', value='\n'.join(team_a['first_blood']))
+        embed2.add_field(name='HS%', value='\n'.join(team_a['hs_percent']))
+       
+        # TEAM B
+        embed2.add_field(name='TEAM B', value='\n'.join(team_b['player']))
+        embed2.add_field(name='FK', value='\n'.join(team_b['first_blood']))
+        embed2.add_field(name='HS%', value='\n'.join(team_b['hs_percent']))
+        
+        # ------ PAGE 3 ------ #
+
+        embed3 = discord.Embed(color=color, timestamp=timestamp)
+        embed3.title = f'{your_name} - Performance'
+        # embed3.set_author(name=f'{queue_emoji} {your_name} - Performance')
+        embed3.add_field(name='KDA', value='\n'.join(opponent_kda))
+        embed3.add_field(name='Opponent', value='\n'.join(opponent))
+        embed3.add_field(name='Abilties', value=your_abilities, inline=False)
+        embed3.set_footer(**footer)
+
+        # embed mobile 
+        
+        embed_mb = discord.Embed(color=color, timestamp=timestamp)
+        embed_mb.set_author(**author)
+        embed_mb.add_field(name='\u200b', value='**TEAM A**')
+        for player, acs, kda in zip(team_a['player'], team_a['acs'], team_a['kda']):
+            embed_mb.add_field(name=player, value=f'ACS: {acs}\nKDA: {kda}', inline=False)
+        embed_mb.add_field(name='\u200b', value='**TEAM B**')
+        for player, acs, kda in zip(team_b['player'], team_b['acs'], team_b['kda']):
+            embed_mb.add_field(name=player, value=f'ACS: {acs}\nKDA: {kda}', inline=False)
+        
+        if len(timelines) >= 24:
+            embed_mb.add_field(name='Timeline:', value=''.join(timelines[:24]), inline=False)
+            embed_mb.add_field(name=''.join(timelines[24:]), value='\u200b', inline=False)
+        else:
+            embed_mb.add_field(name='Timeline:', value=''.join(timelines), inline=False)
+
+        # compact embed page 2
+        embed_mb2 = discord.Embed(color=color, timestamp=timestamp)
+        embed_mb2.set_author(**author)
+        embed_mb2.add_field(name='\u200b', value='**TEAM A**')
+        for player, fb, hs in zip(team_a['player'], team_a['first_blood'], team_a['hs_percent']):
+            embed_mb2.add_field(name=player, value=f'First Bloods: {fb}\nHeadshot%: {hs}', inline=False)
+        embed_mb2.add_field(name='\u200b', value='**TEAM B**')
+        for player, fb, hs in zip(team_b['player'], team_b['first_blood'], team_b['hs_percent']):
+            embed_mb2.add_field(name=player, value=f'First Bloods: {fb}\nHeadshot%: {hs}', inline=False)
+
+        # compact embed page 3
+        embed_mb3 = discord.Embed(color=color, timestamp=timestamp)
+        embed_mb3.set_author(name=f'{your_name} - Performance', icon_url=your_agent['icon']['icon'])
+        embed_mb3.add_field(name='KDA Opponent', value='\n'.join([' '.join(x) for x in itertools.zip_longest(opponent_kda, opponent)]))
+        embed_mb3.add_field(name='Abilties', value=your_abilities, inline=False)
+
+        embeds = []
+        embeds_mb = []
+        embeds.append(embed)
+        embeds.append(embed2)      
+        embeds_mb.append(embed_mb)
+        embeds_mb.append(embed_mb2)
+        if queue_id not in ['ggteam']:
+            embeds.append(embed3)
+            embeds_mb.append(embed_mb3)
+        
+        return embeds, embeds_mb
 
     def __giorgio_embed(skin: Dict) -> discord.Embed:
         uuid, name, price, icon = skin['uuid'], skin['name'], skin['price'], skin['icon']

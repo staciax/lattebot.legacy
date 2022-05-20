@@ -20,6 +20,88 @@ from .auth import Auth
 from .locale import LocaleResponse, LocaleErrorResponse, InteractionLanguage
 from .useful import JSON
 
+class MatchDetails(ui.View):
+    def __init__(self, interaction: Interaction, embeds_desktop: List[discord.Embed], embeds_mobile: List[discord.Embed]):
+        self.interaction = interaction
+        self.embeds_desktop = embeds_desktop
+        self.embeds_mobile = embeds_mobile
+        super().__init__(timeout=180)
+        self.current_page = 0
+        self.is_on_mobile = False
+        self.embeds: List[discord.Embed] = []
+        self.message: Optional[discord.Message] = None
+        self.__update_embed()
+        self.__fill_items()
+        self.__update_buttons()
+
+    def __update_embed(self):
+        self.embeds = self.embeds_desktop if not self.is_on_mobile else self.embeds_mobile
+
+    def __fill_items(self):
+        self.clear_items()
+        self.add_item(self.back_page)
+        self.add_item(self.next_page)
+        self.add_item(self.desktop_or_mobile)
+
+    async def on_timeout(self) -> None:
+        if self.message:
+            await self.message.edit(embed=self.embeds[0], view=None)
+    
+    def __update_buttons(self) -> None:
+        page = self.current_page
+        total = len(self.embeds) - 1
+        self.back_page.disabled = page == 0
+        self.next_page.disabled = page == total
+
+    async def show_page(self, interaction: Interaction, page_number: int) -> None:
+        try:
+            if page_number <= 1 and page_number != 0:
+                page_number = self.current_page + page_number
+            self.current_page = page_number
+            self.__update_buttons()
+            embed = self.embeds[self.current_page]
+            await interaction.response.edit_message(embed=embed, view=self)
+        except IndexError:
+            # An error happened that can be handled, so ignore it.
+            pass
+
+    @ui.button(label='≪', style=ButtonStyle.blurple)
+    async def back_page(self, interaction: Interaction, button: ui.Button):
+        self.__update_embed()
+        await self.show_page(interaction, - 1)
+        
+    @ui.button(label='≫', style=ButtonStyle.blurple)
+    async def next_page(self, interaction: Interaction, button: ui.Button):
+        self.__update_embed()
+        await self.show_page(interaction, +1)
+
+    @ui.button(emoji='📱', style=ButtonStyle.green, custom_id='mobile')
+    async def desktop_or_mobile(self, interaction: Interaction, button: ui.Button):
+        if button.custom_id == 'mobile':
+            self.is_on_mobile = True
+            self.desktop_or_mobile.emoji = '🖥️'
+            self.desktop_or_mobile.custom_id = 'desktop'
+            return await interaction.response.edit_message(embed=self.embeds_mobile[self.current_page], view=self)
+        
+        self.is_on_mobile = False
+        self.desktop_or_mobile.emoji = '📱'
+        self.desktop_or_mobile.custom_id = 'mobile'
+        await interaction.response.edit_message(embed=self.embeds_desktop[self.current_page], view=self)
+    
+    # @ui.button(label='Share to friends', style=ButtonStyle.primary)
+    # async def share_button(self, interaction: Interaction, button: ui.Button):
+    #     self.remove_item(self.share_button)
+    #     self.message = await interaction.channel.send(embed=self.current_embed, view=self)
+    #     await interaction.response.edit_message(view=None, embed=None, content='\u200b')
+
+    async def start(self):
+        if self.interaction.response.is_done():
+            self.message = await self.interaction.followup.send(embed=self.embeds[0], view=self)
+            return
+        await self.interaction.response.send_message(embed=self.embeds[0], view=self, ephemeral=True)
+        self.message = await self.interaction.original_message()
+
+
 class share_button(ui.View):
     def __init__(self, interaction: Interaction, embeds: List[discord.Embed]):
         self.interaction = interaction

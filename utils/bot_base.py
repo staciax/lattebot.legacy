@@ -104,6 +104,7 @@ class Latte_Bot(commands.AutoShardedBot):
         # valorant ext cache stuff
         self.valorant_users = {}
         self.valorant_notify = {}
+        self.tree.interaction_check = self.interaction_check
         
         # self.global_mapping = commands.CooldownMapping.from_cooldown(1, 60, commands.BucketType.user)
         # Bot based stuff
@@ -135,6 +136,9 @@ class Latte_Bot(commands.AutoShardedBot):
         )
         
         await self.blacklist_user()
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return True
 
     # @property
     # def stacia(self) -> Optional[discord.User]:
@@ -206,6 +210,15 @@ class Latte_Bot(commands.AutoShardedBot):
         await self.session.close()
 
     async def create_db_pool(self) -> asyncpg.Pool:
+        digitalocean = {
+            "user": "staciax",
+            "password": "089298",
+            "database": "postgres",
+            "host": "167.172.80.131",
+            "port": "5432",
+            "min_size": 1,
+            "max_size": 5
+        }
         localhost = {
             "user": "postgres",
             "password": "089298",

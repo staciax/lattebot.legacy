@@ -59,7 +59,6 @@ async def run_bot():
     await bot.start(dev=False) 
 
 if __name__ == '__main__':
-            
     logging.basicConfig(level=logging.INFO, format=f'%(asctime)s:%(levelname)s:%(name)s: %(message)s')
     try:
         main()

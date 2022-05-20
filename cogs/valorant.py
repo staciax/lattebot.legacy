@@ -7,6 +7,7 @@ from discord import app_commands, Interaction, Forbidden, HTTPException
 from discord.app_commands.checks import dynamic_cooldown
 from discord.utils import MISSING
 from typing import Literal, Optional, Union, Any, Tuple, List, Dict
+from ext.valorant.view import MatchDetails
 
 from datetime import datetime, time
 from utils.bot_base import Latte_Bot
@@ -707,6 +708,48 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         endpoint.pregame_lock_character(agent_id, match_id)
         
         await interaction.followup.send(f"**Instalock:** {emoji} {agents}")
+
+    @app_commands.command()
+    @app_commands.describe(queue='Queue name')
+    @app_commands.choices(queue=[
+        app_commands.Choice(name='Unrated', value='unrated'),
+        app_commands.Choice(name='Competitive', value='competitive'),
+        app_commands.Choice(name='Deathmatch', value='deathmatch'),
+        app_commands.Choice(name='Spike Rush', value='spikerush'),
+        app_commands.Choice(name='Escalation', value='escalation'),
+        app_commands.Choice(name='Replication', value='replication'),
+        app_commands.Choice(name='Snowball Fight', value='snowball'),
+        app_commands.Choice(name='Custom', value='custom'),
+    ])
+    @dynamic_cooldown(cooldown_5s)
+    @app_commands.describe(queue= 'Choose the queue')
+    async def match(self, interaction: Interaction, queue: str="null") -> None:
+        """ Last match history """
+
+        await interaction.response.defer()
+
+        queue_overite = {'escalation': 'ggteam', 'replication': 'onefa'}
+
+        queue_id = queue_overite.get(queue, queue)
+
+        endpoint = await self.get_endpoint(interaction.user.id, interaction.locale)
+
+        fetch_match_history = endpoint.fetch_match_history(queue_id=queue_id, start_index=0, end_index=1)
+        match_history = fetch_match_history['History']
+
+        puuid = endpoint.puuid
+
+        if len(match_history) == 0:
+            raise RuntimeError(f'No match found for `{queue}`')
+
+        match_id = match_history[0]['MatchID']
+        queue_id = match_history[0]['QueueID']
+        match_details = endpoint.fetch_match_details(match_id)
+
+        embeds, embeds_mobile = Generate_Embed.match_result(puuid, match_details, queue_id, endpoint)
+
+        view = MatchDetails(interaction, embeds, embeds_mobile)
+        await view.start()
 
     # @valorant.command()
     # # @app_commands.guilds(discord.Object(id=840379510704046151))
