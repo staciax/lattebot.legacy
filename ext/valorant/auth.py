@@ -68,7 +68,7 @@ class Auth:
         cookies['cookie'] = r.cookies.get_dict()
 
         # get access token
-        data = {"type": "auth", "username": username, "password": password}
+        data = {"type": "auth", "username": username, "password": password, "remember": True}
         r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
 
         session.close()
@@ -180,7 +180,7 @@ class Auth:
         
         headers = {'Content-Type': 'application/json', 'User-Agent': self.user_agent}
 
-        data = {"type": "multifactor", "code": twoFAcode, "rememberDevice": False}
+        data = {"type": "multifactor", "code": twoFAcode, "rememberDevice": True}
 
         r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers, cookies=cookies['cookie'])
         
