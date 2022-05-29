@@ -34,7 +34,7 @@ class Notifys(commands.Cog):
         self.notifys.cancel()
 
     async def get_endpoint(self, user_id: int) -> VALORANT_ENDPOINT:
-        data = await self.db.is_data(user_id)
+        data = await self.db.is_data(user_id, 'en-US')
         endpoint = VALORANT_ENDPOINT()
         endpoint.activate(data)
         return endpoint
@@ -48,7 +48,7 @@ class Notifys(commands.Cog):
                 endpoint = await self.get_endpoint(user_id)
                 offer = endpoint.store_fetch_storefront()
                 author = self.bot.get_user(user_id) or await self.bot.fetch_user(user_id)
-                skin_list = GetFormat.offer_format(offer, language = 'en-US')
+                skin_list = GetFormat.offer(offer, language = 'en-US')
 
                 if user['notify_mode'] == 'All':
                     embeds = Generate_Embed.notify_all(endpoint.player, skin_list)
@@ -63,9 +63,10 @@ class Notifys(commands.Cog):
 
     @tasks.loop(time=time(hour=0, minute=0, second=10)) #utc 00:00:15
     # @tasks.loop(seconds=10)  # utc 00:00:15
+    # @tasks.loop(seconds=10)
     async def notifys(self) -> None:
         __verify_time = datetime.utcnow()
-        if __verify_time.hour == 0 and __verify_time.minute <= 10:
+        if __verify_time.hour == 0:
             await self.send_notify()
 
     @notifys.before_loop
@@ -228,7 +229,7 @@ class Notifys(commands.Cog):
             endpoint = await self.get_endpoint(user_id)
             offer = endpoint.store_fetch_storefront()
             author = self.bot.get_user(user_id) or await self.bot.fetch_user(user_id)
-            skin_list = GetFormat.offer_format(offer, language = 'en-US')
+            skin_list = GetFormat.offer(offer, language = 'en-US')
 
             if data['notify_mode'] == 'All':
                 embeds = Generate_Embed.notify_all(endpoint.player, skin_list)
