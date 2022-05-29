@@ -223,7 +223,7 @@ class Notifys(commands.Cog):
         response_test = LocaleResponse('notify_test', interaction.locale)
 
         user_id = interaction.user.id
-        data = self.db.is_login(user_id)
+        data = await self.db.is_login(user_id)
 
         try:
             endpoint = await self.get_endpoint(user_id)
