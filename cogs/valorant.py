@@ -196,7 +196,7 @@ class Notifys(commands.Cog):
         
         user_id = interaction.user.id
         # channel_id = interaction.channel.id
-        data = await self.db.is_data(user_id)
+        data = await self.db.is_data(user_id, 'en-US')
         db = self.bot.db
 
         notify = {'Specified Skin': 'Spc', 'All Skin': 'All', 'Off': 'Off'}
