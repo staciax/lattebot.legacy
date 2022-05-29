@@ -33,7 +33,7 @@ class ErrorHandler(commands.Cog):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
    
-        if await interaction.client.is_owner(interaction.user):
+        if interaction.user.id == 240059262297047041:
             return True
             
         locale = interaction.locale
