@@ -28,7 +28,9 @@ os.environ['JISHAKU_NO_UNDERSCORE'] = 'True'
 os.environ['JISHAKU_HIDE'] = 'True'
 
 class Latte_Bot(commands.AutoShardedBot):
-    
+
+    db: asyncpg.Pool
+    bot_app_info: discord.AppInfo
     log = logging.getLogger('Latte_bot.logging')
     log_ext = logging.getLogger('Latte_bot.extensions')
     
@@ -138,6 +140,12 @@ class Latte_Bot(commands.AutoShardedBot):
         await self.blacklist_user()
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        locale = interaction.locale
+        if self.dev_mode is True:
+            messages = {"th": "❌ ปิดแก้ไขบัคสักครู่น้าา"}
+            msg_response = messages.get(locale, "❌ Bot is under maintenance. please wait")            
+            await interaction.response.send_message(msg_response)
+            return False
         return True
 
     # @property
