@@ -25,10 +25,25 @@ class ErrorHandler(commands.Cog):
         self.bot = bot
         # setting the handler
         bot.tree.on_error = self.on_app_command_error
+        bot.tree.interaction_check = self.interaction_check
 
     @property
     def display_emoji(self) -> discord.Emoji:
         return '<:valoranticon:974232643031937024>'
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+   
+        if await interaction.client.is_owner(interaction.user):
+            return True
+            
+        locale = interaction.locale
+        if self.dev_mode is True:
+            message = "❌ Bot is under maintenance. please wait"
+            if locale == 'th':
+                message = "❌ ปิดแก้ไขบัคสักครู่น้าา"    
+            await interaction.response.send_message(message)
+            return False
+        return True
 
     async def on_app_command_error(self, interaction: Interaction, error: AppCommandError):
         """ Handles errors for all application commands associated with this CommandTree."""

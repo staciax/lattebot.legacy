@@ -105,9 +105,7 @@ class Latte_Bot(commands.AutoShardedBot):
 
         # valorant ext cache stuff
         self.valorant_users = {}
-        self.valorant_notify = {}
-        self.tree.interaction_check = self.interaction_check
-        
+        self.valorant_notify = {}        
         # self.global_mapping = commands.CooldownMapping.from_cooldown(1, 60, commands.BucketType.user)
         # Bot based stuff
     
@@ -138,15 +136,6 @@ class Latte_Bot(commands.AutoShardedBot):
         )
         
         await self.blacklist_user()
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        locale = interaction.locale
-        if self.dev_mode is True:
-            messages = {"th": "❌ ปิดแก้ไขบัคสักครู่น้าา"}
-            msg_response = messages.get(locale, "❌ Bot is under maintenance. please wait")            
-            await interaction.response.send_message(msg_response)
-            return False
-        return True
 
     # @property
     # def stacia(self) -> Optional[discord.User]:
