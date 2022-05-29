@@ -37,10 +37,10 @@ class ErrorHandler(commands.Cog):
             return True
             
         locale = interaction.locale
-        if self.dev_mode is True:
+        if self.dev_mode is True: 
             message = "❌ Bot is under maintenance. please wait"
-            if locale == 'th':
-                message = "❌ ปิดแก้ไขบัคสักครู่น้าา"    
+            if str(locale) == 'th':
+                message = "❌ บอทอยู่ระหว่างการปรับปรุง กรุณาลองใหม่อีกครั้งในภายหลัง"
             await interaction.response.send_message(message)
             return False
         return True
