@@ -44,7 +44,7 @@ class Latte_Bot(commands.AutoShardedBot):
         # intents.presences = True
 
         super().__init__(
-            command_prefix=os.getenv('PREFIX'),
+            command_prefix=['l-'],
             help_command=None,
             case_insensitive=True,
             allowed_mentions=allowed_mentions,
