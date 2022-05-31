@@ -536,7 +536,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     
     valorant = app_commands.Group(name='valorant', description='valorant commands')
 
-    @valorant.command()
+    @app_commands.command()
     @app_commands.describe(cookie='Your cookies')
     @dynamic_cooldown(cooldown_5s)
     async def cookies(self, interaction: Interaction, cookie: str) -> None:

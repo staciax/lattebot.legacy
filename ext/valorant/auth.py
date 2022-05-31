@@ -13,7 +13,7 @@ from .locale import LocaleErrorResponse
 # disable urllib3 warnings that might arise from making requests to 127.0.0.1
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def extract_tokens_from_url(URL: str, locale_code: str) -> Optional[Tuple[str, str]]:
+def extract_tokens_from_uri(URL: str, locale_code: str) -> Optional[Tuple[str, str]]:
     # language
     response = LocaleErrorResponse('AUTH', locale_code)
     
@@ -226,7 +226,7 @@ class Auth:
         for cookie in r.cookies.items():
             cookies['cookie'][cookie[0]] = cookie[1]
 
-        accessToken, tokenId = extract_tokens_from_url(r.text, locale_code)
+        accessToken, tokenId = extract_tokens_from_uri(r.text, locale_code)
         entitlements_token = self.get_entitlements_token(accessToken)
         
         return cookies, accessToken, entitlements_token, tokenId
@@ -248,7 +248,7 @@ class Auth:
         # NEW COOKIE
         cookies = {}
         cookies['cookie'] = r.cookies.get_dict()
-        accessToken, tokenID = extract_tokens_from_url(r.text, locale_code)
+        accessToken, tokenID = extract_tokens_from_uri(r.text, locale_code)
         entitlements_token = self.get_entitlements_token(accessToken)
 
         data = {
