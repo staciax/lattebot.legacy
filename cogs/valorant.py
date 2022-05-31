@@ -546,7 +546,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         language = InteractionLanguage(interaction.locale)
         response = LocaleResponse(interaction.command.name, interaction.locale)
 
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         response = await self.db.cookie_login(interaction.user.id, cookie, interaction.guild_id, interaction.locale)
 
         if response['auth']:
