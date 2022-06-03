@@ -50,7 +50,6 @@ class Misc(Cog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name='invite')
-    @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
     async def invite(self, interaction: Interaction) -> None:
         """Add the Latte bot to your server"""
 
@@ -78,7 +77,6 @@ class Misc(Cog):
         await interaction.response.send_message(embed=embed, view=view)
     
     @app_commands.command(name='about')
-    @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
     @dynamic_cooldown(cooldown_5s)
     async def about(self, interaction: Interaction) -> None:
         """Shows basic information about the bot."""
@@ -134,7 +132,6 @@ class Misc(Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command(name='support')
-    @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
     @dynamic_cooldown(cooldown_5s)
     async def support(self, interaction: Interaction) -> None:
         """Sends the support server of the bot."""
@@ -157,7 +154,6 @@ class Misc(Cog):
 
     @app_commands.command(name='report')
     @app_commands.describe(message='Input report message"')
-    @app_commands.checks.bot_has_permissions(embed_links=True, send_messages=True)
     @dynamic_cooldown(cooldown_5s)
     async def report(self, interaction: Interaction, message: str) -> None:
         """Report to owner bot"""
