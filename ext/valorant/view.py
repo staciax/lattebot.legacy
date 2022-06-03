@@ -610,19 +610,19 @@ class BaseBundle(discord.ui.View):
 
         FBundle = self.entries['FeaturedBundle']['Bundles']
         for fbd in FBundle:
-            get_bundle = GetItem.get_bundle(FBundle["DataAssetID"])
+            get_bundle = GetItem.get_bundle(fbd["DataAssetID"])
             bundle_payload = {
-                "uuid": FBundle["DataAssetID"],
+                "uuid": fbd["DataAssetID"],
                 "icon": get_bundle['icon'],
                 "names": get_bundle['names'],
-                "duration": FBundle["DurationRemainingInSeconds"],
+                "duration": fbd["DurationRemainingInSeconds"],
                 "items": []
             }
 
             price = 0
             baseprice = 0
 
-            for items in FBundle['Items']:
+            for items in fbd['Items']:
                 item_payload = {
                     "uuid": items["Item"]["ItemID"],
                     "type": items["Item"]["ItemTypeID"],
