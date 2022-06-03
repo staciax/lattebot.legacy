@@ -681,7 +681,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         
         await interaction.followup.send(embed=Embed(f'Successfully cleared database `valorant.{clear_type.lower()}`'))
 
-    @valorant.command()
+    @app_commands.command()
     @dynamic_cooldown(cooldown_5s)
     async def inventory(self, interaction: Interaction) -> None:
         """คอลเลคชั่นของเรา / Shows your inventory"""
