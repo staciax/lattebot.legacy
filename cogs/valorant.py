@@ -88,7 +88,7 @@ class Notifys(commands.Cog):
     @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(skin='The name of the skin you want to notify')
     async def notify_add(self, interaction: Interaction, skin: str) -> None:
-        """Set a notification when a specific skin is available on your store"""
+        """เพิ่มแจ้งเตือนสกิน /Set a notification when a specific skin is available on your store"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -173,7 +173,7 @@ class Notifys(commands.Cog):
     @notify.command(name='list', description='View skins you have set a for notification.')
     @dynamic_cooldown(cooldown_5s)
     async def notify_list(self, interaction: Interaction) -> None:
-        """View skins you have set a notification for"""
+        """ดูรายการแจ้งเตือน /View skins you have set a notification for"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -190,7 +190,7 @@ class Notifys(commands.Cog):
     @app_commands.describe(mode='Choose notification')
     @dynamic_cooldown(cooldown_5s)
     async def notify_mode(self, interaction: Interaction, mode: Literal['Specified Skin', 'All Skin', 'Off']) -> None:
-        """Set Skin Notifications mode"""
+        """เปลี่ยนโหมดแจ้งเตือน /Set Skin Notifications mode"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -213,9 +213,10 @@ class Notifys(commands.Cog):
             
         return await interaction.response.send_message(embed=embed)
 
-    @notify.command(name='test', description='Testing notification')
+    @notify.command(name='test')
     @dynamic_cooldown(cooldown_5s)
     async def notify_test(self, interaction: Interaction) -> None:
+        """ ทดสอบแจ้งเตือน /Test Notifications"""
 
         await interaction.response.defer(ephemeral=True)
         
@@ -292,7 +293,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username', password='Input password')
     async def login(self, interaction: Interaction, username: str, password: str) -> None:
-        """Log in with your Riot accounts"""
+        """เข้าสู่ระบบด้วยบัญชี Riot / Log in with your Riot accounts"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -326,7 +327,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @app_commands.command()
     @dynamic_cooldown(cooldown_5s)
     async def logout(self, interaction: Interaction) -> None:
-        """Logout and Delete your accounts from database"""
+        """ออกจากระบบ / Logout and Delete your accounts from database"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -359,7 +360,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     async def store(self, interaction: Interaction, username: str = None, password: str = None) -> None:
-        """Shows your daily store in your accounts"""
+        """ดูร้านค้ารายวัน / Shows your daily store in your accounts"""
 
         # check if user is logged in
         is_private_message = True if username is not None or password is not None else False
@@ -410,7 +411,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     @dynamic_cooldown(cooldown_5s)
     async def battlepass(self, interaction: Interaction, username: str = None, password: str = None) -> None:
-        """View your battlepass current tier"""
+        """แบทเทิลพาส / View your battlepass current tier"""
 
         # check if user is logged in
         is_private_message = True if username is not None or password is not None else False
@@ -434,7 +435,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     @dynamic_cooldown(cooldown_5s)
     async def point(self, interaction: Interaction, username: str = None, password: str = None) -> None:
-        """View your remaining Valorant and Riot Points (VP/RP)"""
+        """จำนวนพอยท์ของคุณ / View your remaining Valorant and Riot Points (VP/RP)"""
 
         # check if user is logged in
         is_private_message = True if username is not None or password is not None else False
@@ -456,7 +457,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     async def mission(self, interaction: Interaction, username: str = None, password: str = None) -> None:
-        """View your daily/weekly mission progress"""
+        """ดูเควสประจำวัน/สัปดาห์ / View your daily/weekly mission progress"""
 
         # check if user is logged in
         is_private_message = True if username is not None or password is not None else False
@@ -479,7 +480,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     async def nightmarket(self, interaction: Interaction, username: str = None, password: str = None) -> None:
-        """Show skin offers on the nightmarket"""
+        """ตลาดกลางคืน / Show skin offers on the nightmarket"""
 
         # check if user is logged in
         is_private_message = True if username is not None or password is not None else False
@@ -497,11 +498,12 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         await interaction.followup.send(embeds=embeds, view=share_button(interaction, embeds) if is_private_message else MISSING)
 
     # inspired by https://github.com/giorgi-o
-    @app_commands.command(description="inspect a specific bundle")
+    @app_commands.command()
     @app_commands.describe(bundle="The name of the bundle you want to inspect!")
     @dynamic_cooldown(cooldown_5s)
     async def bundle(self, interaction: Interaction, bundle: str) -> None:
-        
+        """ค้นหาคอลเลคชั่นตามทีระบุ / inspect a specific bundle"""
+
         await interaction.response.defer()
 
         # language
@@ -547,8 +549,9 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         ][:10]
             
     # inspired by https://github.com/giorgi-o
-    @app_commands.command(description="Show the current featured bundles")
+    @app_commands.command()
     async def bundles(self, interaction: Interaction) -> None:
+        """คอลเลคชั่นปัจจุบัน / Show the current featured bundles"""
 
         await interaction.response.defer()
         
@@ -572,7 +575,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @app_commands.describe(cookie='Your cookies')
     @dynamic_cooldown(cooldown_5s)
     async def cookies(self, interaction: Interaction, cookie: str) -> None:
-        """Log in with your Riot acoount by Cookies"""
+        """เข้าสู่ระบบด้วยคุกกี้ / Log in with your Riot acoount by Cookies"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -595,7 +598,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @app_commands.describe(region='Select region to get the leaderboard')
     @dynamic_cooldown(cooldown_5s)
     async def leaderboard(self, interaction: Interaction, region: Literal['AP', 'EU', 'NA', 'KR']) -> None:
-        """Shows your Region Leaderboard"""
+        """ตารางอันดับ / Shows your Region Leaderboard"""
 
         # language
         language = InteractionLanguage(interaction.locale)
@@ -669,7 +672,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @valorant.command()
     @dynamic_cooldown(cooldown_5s)
     async def inventory(self, interaction: Interaction) -> None:
-        """Shows your inventory"""
+        """คอลเลคชั่นของเรา / Shows your inventory"""
 
         # # language
         language = InteractionLanguage(interaction.locale)
@@ -757,7 +760,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
     @dynamic_cooldown(cooldown_5s)
     @app_commands.describe(queue= 'Choose the queue')
     async def match(self, interaction: Interaction, queue: str="null") -> None:
-        """ Last match history """
+        """ ดูแมทล่าสุดที่เล่น / Last match history """
 
         await interaction.response.defer()
 
