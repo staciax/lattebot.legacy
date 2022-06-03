@@ -305,6 +305,12 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
         auth = self.authenticate(username, password, interaction.locale)
 
+        privacy_policy_text = {'th':'นโยบายความเป็นส่วนตัว', 'en-US': 'Privacy Policy'}
+        privacy_policy_site = 'https://lattebot.xyz/privacy'
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label=privacy_policy_text.get(str(interaction.locale), privacy_policy_text['en-US']), url=privacy_policy_site))
+        auto_logout = {'th':'ออกจากระบบอัตโนมัติทุกวันที่ 30 ทุกเดือน', 'en-US':'Auto logout every 30th of the month'}
+
         if auth['auth'] == 'response':
             await interaction.response.defer(ephemeral=True)
 
@@ -312,7 +318,9 @@ class ValorantCommands(commands.Cog, name='Valorant'):
 
             if login['auth']:
                 embed = Embed(description=f"{response.get('SUCCESS')} **{login['player']}**")
-                await interaction.followup.send(embed=embed, ephemeral=True)
+                embed.set_footer(text=auto_logout.get(str(interaction.locale), auto_logout['en-US']))
+                embed.set_image(url='https://i.imgflip.com/344hqk.jpg')
+                await interaction.followup.send(embed=embed, ephemeral=True, view=view)
                 return
 
             elif not login['auth']:
