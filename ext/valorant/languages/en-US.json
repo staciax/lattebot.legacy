@@ -118,13 +118,13 @@
             },
             "TITLE": "Collection",
             "DROPDOWN_CHOICE_TITLE": "Select a bundle:",
-            "DURATION": "Remaining {duration}",
             "NOT_FOUND_BUNDLE": "Not found any bundle"
         },
         "bundles": {
             "NAME": "bundles",
             "DESCRIPTION": "View your bundle progress",
             "TITLE": "Featured Bundle: {bundle} Collection",
+            "DURATION": "Remaining {duration}",
             "DROPDOWN_CHOICE_TITLE": "Select a bundle:"
         },
         "debug": {

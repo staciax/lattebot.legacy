@@ -549,6 +549,7 @@ class BaseBundle(discord.ui.View):
         name = bundle['names'][self.language]
 
         featured_bundle_title = self.response.get('TITLE')
+ 
         embed = discord.Embed(title=featured_bundle_title.format(bundle=name), description=f"{vp_emoji} **{bundle['price']}** ~~{bundle['base_price']}~~",color=0xfd4554).set_image(url=bundle['icon'])
 
         embed_list = []

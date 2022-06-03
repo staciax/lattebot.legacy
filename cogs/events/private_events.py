@@ -24,6 +24,7 @@ class PrivateEvents(EventsBase):
                                    
         embed.add_field(name='ᴍᴇᴍʙᴇʀ ᴄᴏᴜɴᴛ', value=f'{guild.member_count}', inline=True)
         embed.add_field(name='ᴄʀᴇᴀᴛɪᴏɴ ᴅᴀᴛᴇ', value=f'{format_dt(guild.created_at)}', inline=True)
+        embed.set_footer(text=self.bot.user)
         if guild.icon is not None:
             embed.set_thumbnail(url=guild.icon)
 
@@ -39,6 +40,7 @@ class PrivateEvents(EventsBase):
                                    
         embed.add_field(name='ᴍᴇᴍʙᴇʀ ᴄᴏᴜɴᴛ', value=f'{guild.member_count}', inline=True)
         embed.add_field(name='ᴄʀᴇᴀᴛɪᴏɴ ᴅᴀᴛᴇ', value=f'{format_dt(guild.created_at)}', inline=True)
+        embed.set_footer(text=self.bot.user)
         if guild.icon is not None:
             embed.set_thumbnail(url=guild.icon)
 

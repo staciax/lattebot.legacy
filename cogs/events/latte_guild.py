@@ -63,6 +63,26 @@ class LatteGuild(EventsBase):
                     embed.colour=0x77dd77
                     await channel.send(embed=embed)
 
+            if before.self_deaf != after.self_deaf:
+                if after.self_deaf:
+                    embed.description = f"**SELF DEAF**"
+                    embed.colour=0xFF7878
+                    await channel.send(embed=embed)
+                if before.self_deaf:
+                    embed.description = f"**SELF UNDEAF**"
+                    embed.colour=0x77dd77
+                    await channel.send(embed=embed)
+
+            if before.self_mute != after.self_mute:
+                if after.self_mute:
+                    embed.description = f"**SELF MUTED**"
+                    embed.colour=0xFF7878
+                    await channel.send(embed=embed)
+                if before.self_mute:
+                    embed.description = f"**SELF UNMUTED**"
+                    embed.colour=0x77dd77
+                    await channel.send(embed=embed)
+
             if after.channel is not None:
                 temp_channel = {
                     '873677543453126676': 873679362082369546,
@@ -74,9 +94,7 @@ class LatteGuild(EventsBase):
                     channel_move = temp_channel[str(after.channel.id)]
                     channel_voice =  member.guild.get_channel(channel_move)
                     return await member.move_to(channel_voice)
-
-
-    
+   
     # @tasks.loop(seconds=1)
     # async def counted(self):
     #     pass
