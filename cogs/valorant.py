@@ -311,6 +311,10 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         view.add_item(discord.ui.Button(label=privacy_policy_text.get(str(interaction.locale), privacy_policy_text['en-US']), url=privacy_policy_site))
         auto_logout = {'th':'ออกจากระบบอัตโนมัติทุกวันที่ 30 ทุกเดือน', 'en-US':'Auto logout every 30th of the month'}
 
+        invite_url = 'https://discord.com/api/oauth2/authorize?client_id=977433932146569216&permissions=137438971904&scope=bot%20applications.commands'
+        invite_bot = {'th':'เชิญบอท latte 2nd', 'en-US': 'invite bot latte 2nd'}
+        view.add_item(discord.ui.Button(label=invite_bot.get(str(interaction.locale), invite_bot['en-US']), url=invite_url))
+
         if auth['auth'] == 'response':
             await interaction.response.defer(ephemeral=True)
 
