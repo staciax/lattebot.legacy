@@ -278,5 +278,10 @@ class Auth:
 
         elif authenticate['auth'] == '2fa':
             return {'error': authenticate['message']}
+
+        not_support = {
+            "en-US": "Not supported 2FA, Please use `/login` and use other cmd without username, password.",
+            "th": "เข้าสู่ระบบชั่วคราว ยังไม่รองรับ 2FA โปรดใช้ `/login` และใช้คำสั่งอื่นๆ โดยไม่มี username, password."
+            } 
         
-        raise RuntimeError('Not supported 2FA, Please `/login` to register!')
+        raise RuntimeError(not_support.get(self.locale_code, not_support['en-US']))

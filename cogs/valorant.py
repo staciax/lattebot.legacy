@@ -277,7 +277,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         
         if username is not None and password is not None:
             auth = Auth()
-            auth.local_code = locale_code
+            auth.locale_code = locale_code
             data = auth.temp_auth(username, password)
         elif username or password:
             raise RuntimeError(f"Please provide both username and password!")
