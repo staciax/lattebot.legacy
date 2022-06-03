@@ -15,9 +15,7 @@
             "NAME": "logout",
             "DESCRIPTION": "Déconnecté, et vos identifiants ont été supprimés de la base de données.",
             "SUCCESS": "Vous êtes bien déconnecté !",
-            "FAILED": "Impossible de vous déconnecter, veuillez réessayer !",
-            "IS_NOTIFY": "You have **{amount}** skins in notify, would you like to remove them?",
-            "REMOVE_NOTIFY": "Successfully removed notify list from database"
+            "FAILED": "Impossible de vous déconnecter, veuillez réessayer !"
         },
         "store": {
             "NAME": "store",
@@ -26,7 +24,7 @@
                 "username": "Entrez le nom d'utilisateur ! (Connexion temporaire)",
                 "password": "Entrez le mot de passe ! (Connexion temporaire)"
             },
-            "RESPONSE": "Boutique du jour pour **{username}** | Temps restant {duration}"
+            "RESPONSE": "Boutique du jour pour **{username}** \n Temps restant {duration}"
         },
         "point": {
             "NAME": "point",
@@ -51,7 +49,7 @@
             "NIGMARKET_HAS_END": "Le **NightMarket** est terminé"
         },
         "battlepass": {
-            "NAME": "nightmarket",
+            "NAME": "battlepass",
             "DESCRIPTION": "Regardez votre niveau actuel du BattlePass",
             "RESPONSE": "**Prochaine récompense:** {next}\n**Type:** {type}\n**XP:** {xp}\n**Fin de l'acte:** {end}",
             "TIER": "Niveau",
@@ -68,7 +66,7 @@
             "DESCRIBE": {
                 "skin": "Le nom du skin dont vous souhaitez être notifié"
             },
-            "SUCCESS": "Vous avez bien activé une notification pour {emoji} **{name}**",
+            "SUCCESS": "Vous avez bien activé une notification pour {emoji} **{skin}**",
             "SKIN_ALREADY_IN_LIST": "{emoji} **{skin}** est déjà dans votre liste de notification !",
             "NOT_FOUND": "Le skin n'a pas été trouvé",
             "REMOVE_NOTIFY": "Supprimer la notification",
@@ -97,11 +95,20 @@
             "NOTIFY_TURN_OFF": "Vous n'avez pas activé le mode de notification",
             "EMPTY_LIST":"La liste de notification est vide",
             "BOT_MISSING_PERM": "**Je n'ai pas la permission pour envoyer une notification dans ce channel !** \n Veuillez vérifier les notifications du bot `View channel`, `Send messages`, `Embed links` et `Use external emoji`. dans ce channel, puis essayez `/notify test`.",
-            "FAILED_SEND_NOTIFY": "Erreur lors de l'envoi de la notification, veuillez réessayer"
+            "FAILED_SEND_NOTIFY": "Erreur lors de l'envoi de la notification, veuillez réessayer",
+            "PLEASE_ALLOW_DM_MESSAGE": "Veuillez autoriser les messages privés dans vos paramètres de confidentialité"
         },
         "notify_send": {
             "RESPONSE_SPECIFIED": "{emoji} **{name}** est dans votre boutique du jour !\nTemps restant {duration}",
             "RESPONSE_ALL": "Boutique du jour pour **{username}** | Temps restant {duration}"
+        },
+        "notify_channel": {
+            "NAME": "channel",
+            "DESCRIPTION": "Change notification channel.",
+            "DESCRIBE": {
+                "channel": "Select the channel you want to change."
+            },
+            "SUCCESS":"Notify channel changed to: **{channel}**"
         },
         "bundle": {
             "NAME": "bundle",
@@ -130,6 +137,15 @@
                 }
             },
             "SUCCESS": "Vous avez bien débugger: **{bug}**"
+        },
+        "cookies": {
+            "NAME": "cookies",
+            "DESCRIPTION": "Login to your account with a cookie",
+            "DESCRIBE": {
+                "cookie": "Your cookie"
+            },
+            "SUCCESS": "Successfully logged in",
+            "FAILED": "Invalid cookie"
         }
     },
     "errors": {

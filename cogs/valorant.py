@@ -9,11 +9,13 @@ from discord.utils import MISSING
 from typing import Literal, Optional, Union, Any, Tuple, List, Dict
 from ext.valorant.view import MatchDetails
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from utils.bot_base import Latte_Bot
 from utils.emojis import LATTE_EMOJI
 from utils.checks import owner_only, cooldown_for_everyone_but_me, cooldown_10s, cooldown_5s
 from ext.valorant.locale import LocaleResponse, InteractionLanguage
+from ext.valorant.pillow import generate_image
+from utils.formats import format_relative
 
 # valorant extension
 from ext.valorant import *
@@ -65,9 +67,9 @@ class Notifys(commands.Cog):
     # @tasks.loop(seconds=10)  # utc 00:00:15
     # @tasks.loop(seconds=10)
     async def notifys(self) -> None:
-        __verify_time = datetime.utcnow()
-        if __verify_time.hour == 0:
-            await self.send_notify()
+        # __verify_time = datetime.utcnow()
+        # if __verify_time.hour == 0:
+        await self.send_notify()
 
     @notifys.before_loop
     async def before_daily_send(self) -> None:
@@ -373,7 +375,37 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         embeds = Generate_Embed.store(endpoint.player, offer, language, response)
 
         await interaction.followup.send(embeds=embeds, view=share_button(interaction, embeds) if is_private_message else MISSING)
+    
+    @app_commands.command()
+    @dynamic_cooldown(cooldown_5s)
+    @app_commands.describe(username='Input username (without login)', password='password (without login)')
+    async def store_p(self, interaction: Interaction, username: str = None, password: str = None) -> None:
+        """ดูร้านค้ารายวัน แบบรูปภาพ / Shows your daily store in your accounts"""
+
+        # check if user is logged in
+        is_private_message = True if username is not None or password is not None else False
+        await interaction.response.defer(ephemeral=is_private_message)
+
+        # language
+        language = InteractionLanguage(interaction.locale)
+        response = LocaleResponse('store', interaction.locale)
+
+        endpoint = await self.get_endpoint(interaction.user.id, interaction.locale, username, password)
         
+        offer = endpoint.store_fetch_storefront()
+        skin_list = GetFormat.offer(offer, language)
+        file = generate_image(skin_list)
+        store_esponse = response.get('RESPONSE')
+        
+        duration = skin_list['duration']
+        description = store_esponse.format(username=endpoint.player, duration=format_relative(datetime.utcnow() + timedelta(seconds=duration)))
+
+        embed = Embed(description=description, color=0x2F3136)
+        embed.set_image(url='attachment://store-offers.png')
+        embed.set_footer(text='Inspired by valorant-tracker.com')
+
+        await interaction.followup.send(embed=embed, file=file, view=share_button(interaction, file) if is_private_message else MISSING)
+
     @app_commands.command()
     @app_commands.describe(username='Input username (without login)', password='password (without login)')
     @dynamic_cooldown(cooldown_5s)

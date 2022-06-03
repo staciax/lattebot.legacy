@@ -108,7 +108,7 @@ class Generate_Embed:
         embed.add_field(name='ACS', value='\n'.join(team_b['acs']))
         embed.add_field(name='KDA', value='\n'.join(team_b['kda']))
 
-        if len(timelines) >= 24:
+        if len(timelines) > 24:
             embed.add_field(name='Timeline:', value=''.join(timelines[:24]), inline=False)
             embed.add_field(name=''.join(timelines[24:]), value='\u200b', inline=False)
         else:

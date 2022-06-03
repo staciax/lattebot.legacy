@@ -6,7 +6,7 @@
             "DESCRIPTION": "Log in with your Riot acoount", 
             "DESCRIBE": {
                 "username": "Input username!",
-                "password": "Input username!"
+                "password": "Input password!"
             },
             "SUCCESS": "Successfully logged in",
             "FAILED": "Failed to log in please try again"
@@ -14,23 +14,21 @@
         "logout": {
             "NAME": "logout",
             "DESCRIPTION": "Logout and Delete your account from database",
-            "SUCCESS": "Successfully logout and remove from database.",
-            "FAILED": "Failed to logout, please try again!",
-            "IS_NOTIFY": "You have **{amount}** skins in notify, would you like to remove them?",
-            "REMOVE_NOTIFY": "Successfully removed notify list from database"
+            "SUCCESS": "Successfully logged out!",
+            "FAILED": "Failed to logout, please try again!"
         },
         "store": {
             "NAME": "store",
             "DESCRIPTION": "Shows your daily store in your accounts",
             "DESCRIBE": {
                 "username": "Input username! (temporary login)",
-                "password": "Input username! (temporary login)"
+                "password": "Input password! (temporary login)"
             },
-            "RESPONSE": "Daily store for **{username}** | Remaining {duration}"
+            "RESPONSE": "Daily store for **{username}** \n Remaining {duration}"
         },
         "point": {
             "NAME": "point",
-            "DESCRIPTION": "View your daily/weekly mission progress",
+            "DESCRIPTION": "View your remaining Valorant and Radiant Points (VP/RP)",
             "POINT": "Points"
         },
         "mission": {
@@ -97,11 +95,20 @@
             "NOTIFY_TURN_OFF": "You're not turn on notification mode",
             "EMPTY_LIST":"Notify list is empty",
             "BOT_MISSING_PERM": "**I don't have permission to send notifications in this channel!** \nplease check permission the bot can `View channel`, `Send messages`, `Embed links` and `Use external emoji`. in this channel, then try `/notify test`.",
-            "FAILED_SEND_NOTIFY": "Failed to send notification, please try again"
+            "FAILED_SEND_NOTIFY": "Failed to send notification, please try again",
+            "PLEASE_ALLOW_DM_MESSAGE": "Please allow DM message in your privacy settings"
         },
         "notify_send": {
             "RESPONSE_SPECIFIED": "{emoji} **{name}** is in your daily store!\nRemaining {duration}",
             "RESPONSE_ALL": "Daily store for **{username}** | Remaining {duration}"
+        },
+        "notify_channel": {
+            "NAME": "channel",
+            "DESCRIPTION": "Change notification channel.",
+            "DESCRIBE": {
+                "channel": "Select the channel you want to change."
+            },
+            "SUCCESS":"Notify channel changed to: **{channel}**"
         },
         "bundle": {
             "NAME": "bundle",
@@ -130,6 +137,15 @@
                 }
             },
             "SUCCESS": "Successfully debuged: **{bug}**"
+        },
+        "cookies": {
+            "NAME": "cookies",
+            "DESCRIPTION": "Login to your account with a cookie",
+            "DESCRIBE": {
+                "cookie": "Your cookie"
+            },
+            "SUCCESS": "Successfully logged in",
+            "FAILED": "Invalid cookie"
         }
     },
     "errors": {
