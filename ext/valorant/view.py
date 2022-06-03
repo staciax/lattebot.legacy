@@ -605,42 +605,69 @@ class BaseBundle(discord.ui.View):
         return await self.interaction.followup.send(embeds=embeds, view=self)
     
     async def start_furture(self) -> None:
-        FBundle = self.entries['FeaturedBundle']['Bundle']
 
-        get_bundle = GetItem.get_bundle(FBundle["DataAssetID"])
+        BUNDLES = []
 
-        bundle_payload = {
-            "uuid": FBundle["DataAssetID"],
-            "icon": get_bundle['icon'],
-            "names": get_bundle['names'],
-            "duration": FBundle["DurationRemainingInSeconds"],
-            "items": []
-        }
-
-        price = 0
-        baseprice = 0
-
-        for items in FBundle['Items']:
-            item_payload = {
-                "uuid": items["Item"]["ItemID"],
-                "type": items["Item"]["ItemTypeID"],
-                "item" : GetItem.Get_by_type(items["Item"]["ItemTypeID"], items["Item"]["ItemID"]),
-                "amount": items["Item"]["Amount"],
-                "price": items["DiscountedPrice"],
-                "base_price": items["BasePrice"],
-                "discount": items["DiscountPercent"]
+        FBundle = self.entries['FeaturedBundle']['Bundles']
+        for fbd in FBundle:
+            get_bundle = GetItem.get_bundle(FBundle["DataAssetID"])
+            bundle_payload = {
+                "uuid": FBundle["DataAssetID"],
+                "icon": get_bundle['icon'],
+                "names": get_bundle['names'],
+                "duration": FBundle["DurationRemainingInSeconds"],
+                "items": []
             }
-            price += int(items["DiscountedPrice"])
-            baseprice += int(items["BasePrice"])
-            bundle_payload['items'].append(item_payload)
 
-        bundle_payload['price'] = price
-        bundle_payload['base_price'] = baseprice
+            price = 0
+            baseprice = 0
 
-        self.embeds = self.build_Featured_Bundle(bundle_payload)
+            for items in FBundle['Items']:
+                item_payload = {
+                    "uuid": items["Item"]["ItemID"],
+                    "type": items["Item"]["ItemTypeID"],
+                    "item" : GetItem.Get_by_type(items["Item"]["ItemTypeID"], items["Item"]["ItemID"]),
+                    "amount": items["Item"]["Amount"],
+                    "price": items["DiscountedPrice"],
+                    "base_price": items["BasePrice"],
+                    "discount": items["DiscountPercent"]
+                }
+                price += int(items["DiscountedPrice"])
+                baseprice += int(items["BasePrice"])
+                bundle_payload['items'].append(item_payload)
+
+            bundle_payload['price'] = price
+            bundle_payload['base_price'] = baseprice
+
+            BUNDLES.append(bundle_payload)
+
+        if len(BUNDLES) > 1:
+            return await self.interaction.followup.send('\u200b', view=SelectionFeaturedBundleView(BUNDLES, self))
+        
+        self.embeds = self.build_Featured_Bundle(BUNDLES[0])
         self.fill_items()
         self.update_button()
         await self.interaction.followup.send(embeds=self.embeds[0], view=self)
+
+class SelectionFeaturedBundleView(ui.View):
+    def __init__(self, bundles: Dict, other_view: Union[ui.View, BaseBundle]= None):
+        self.bundles = bundles
+        self.other_view = other_view
+        super().__init__(timeout=120)
+        self.__build_select()
+
+    def __build_select(self) -> None:
+        for index, bundle in enumerate(self.bundles):
+            self.select_bundle.add_option(label=bundle['names']['en-US'], value=index)
+
+    @ui.select(placeholder='Select a bundle:')
+    async def select_bundle(self, interaction: Interaction, select: ui.Select):
+        value = select.values[0]
+        bundle = self.bundles[int(value)]
+        embeds = self.other_view.build_Featured_Bundle(bundle)
+        self.other_view.fill_items()
+        self.other_view.update_button()
+        await interaction.response.edit_message(content=None, embeds=embeds[0], view=self.other_view)
 
 class AgentInfoView(ui.View):
 
