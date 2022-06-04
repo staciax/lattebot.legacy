@@ -35,14 +35,14 @@ class LatteVerifyView(ui.View):
 
 class DeveloperContributorRequest(ui.Modal, title='Developer/Contributor'):
     role_request = discord.ui.TextInput(
-        label="Role Request",
-        placeholder='What role are you requesting?',
+        label="What role are you requesting?",
+        placeholder='dev or contrib?',
         style=discord.TextStyle.short,
         max_length=20,
     )
-    name = discord.ui.TextInput(
-        label="Request exclusive role",
-        placeholder='Please describe your request',
+    describe = discord.ui.TextInput(
+        label="describe your request",
+        placeholder='...?',
         style=discord.TextStyle.paragraph,
         max_length=300,
     )
@@ -57,11 +57,11 @@ class DeveloperContributorRequest(ui.Modal, title='Developer/Contributor'):
         channel = guild.get_channel(934041100048535563)
         embed = discord.Embed(
             title="Developer Request",
-            description=f"**Role:**{self.role_request.value}\n**Request:** {self.name.value}\n**Github:** {self.github.value}\nUser: {interaction.user.mention}",
+            description=f"**Role:**{self.role_request.value}\n**Request:** {self.describe.value}\n**Github:** {self.github.value}\nUser: {interaction.user.mention}",
             color=0xffffff
         )
         await channel.send(content='<@240059262297047041>', embed=embed)
-        await interaction.response.send_message(embed=discord.Embed(description=f"Thank you for your request. We will get back to you as soon as possible.", color=0xffffff), ephemeral=True)
+        await interaction.followup.send(f"Thank you for your request. We will get back to you as soon as possible.", ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
