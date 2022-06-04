@@ -11,6 +11,7 @@ class LatteGuild(EventsBase):
     async def latte_voice_log(self, member:discord.Member, before:discord.VoiceState, after:discord.VoiceState):
         
         channel = self.bot.get_channel(870173863726682112)
+        mute_deaf_channel = self.bot.get_channel(982683876570845234)
 
         if member.guild.id == 840379510704046151:
             
@@ -47,41 +48,41 @@ class LatteGuild(EventsBase):
                 if after.deaf:
                     embed.description = f"**ᴍᴇᴍʙᴇʀ ᴅᴇᴀꜰ**"
                     embed.colour=0xFF7878
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
                 if before.deaf:
                     embed.description = f"**ᴍᴇᴍʙᴇʀ ᴜɴᴅᴇᴀꜰ**"
                     embed.colour=0x77dd77
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
 
             if before.mute != after.mute:
                 if after.mute:
                     embed.description = f"**MEMBER MUTED**"
                     embed.colour=0xFF7878
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
                 if before.mute:
                     embed.description = f"**ᴍᴇᴍʙᴇʀ ᴜɴᴍᴜᴛᴇᴅ**"
                     embed.colour=0x77dd77
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
 
             if before.self_deaf != after.self_deaf:
                 if after.self_deaf:
                     embed.description = f"**SELF DEAF**"
                     embed.colour=0xFF7878
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
                 if before.self_deaf:
                     embed.description = f"**SELF UNDEAF**"
                     embed.colour=0x77dd77
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
 
             if before.self_mute != after.self_mute:
                 if after.self_mute:
                     embed.description = f"**SELF MUTED**"
                     embed.colour=0xFF7878
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
                 if before.self_mute:
                     embed.description = f"**SELF UNMUTED**"
                     embed.colour=0x77dd77
-                    await channel.send(embed=embed)
+                    await mute_deaf_channel.send(embed=embed)
 
             if after.channel is not None:
                 temp_channel = {

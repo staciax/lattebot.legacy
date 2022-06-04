@@ -606,7 +606,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         
         raise RuntimeError(f"2FA Code is valid")
 
-    @valorant.command()
+    @app_commands.command()
     @app_commands.describe(region='Select region to get the leaderboard')
     @dynamic_cooldown(cooldown_5s)
     async def leaderboard(self, interaction: Interaction, region: Literal['AP', 'EU', 'NA', 'KR']) -> None:
