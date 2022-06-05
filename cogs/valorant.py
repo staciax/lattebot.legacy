@@ -413,7 +413,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         duration = skin_list['duration']
         description = store_esponse.format(username=endpoint.player, duration=format_relative(datetime.utcnow() + timedelta(seconds=duration)))
 
-        embed = Embed(description=description, color=0x2F3136)
+        embed = Embed(description=description, color=0xfd4554) #0x2F3136
         embed.set_image(url='attachment://store-offers.png')
         embed.set_footer(text='Inspired by valorant-tracker.com')
 
