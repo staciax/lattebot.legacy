@@ -344,7 +344,7 @@ class GetFormat:
             skin = GetItem.get_skin(uuid)
             price = GetItem.get_skin_price(uuid)
             tier_icon = GetItem.get_skin_tier_icon(uuid)
-            name, icon = skin['names']['en-US'], skin['icon']
+            name, icon = skin['names'][language], skin['icon']
 
             if skin_count == 0:
                 skin1 = dict(name=name, icon=icon, price=price, tier=tier_icon, uuid=uuid)

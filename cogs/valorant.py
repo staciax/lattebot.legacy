@@ -406,7 +406,7 @@ class ValorantCommands(commands.Cog, name='Valorant'):
         endpoint = await self.get_endpoint(interaction.user.id, interaction.locale, username, password)
         
         offer = endpoint.store_fetch_storefront()
-        skin_list = GetFormat.offer(offer, language)
+        skin_list = GetFormat.offer(offer, 'en-US')
         file = generate_image(skin_list)
         store_esponse = response.get('RESPONSE')
         
