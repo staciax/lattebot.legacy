@@ -1,19 +1,25 @@
-# Standard
 import json
 import re
 import urllib3
-from typing import Tuple, Dict, Optional
+import ssl
+import requests
+from typing import Tuple, Dict, Optional, Any
 
-# Third
-# import requests
-import cloudscraper
+# import cloudscraper
+from requests.adapters import HTTPAdapter
+from collections import OrderedDict
 
 from .locale import LocaleErrorResponse
 
-# Local
-
 # disable urllib3 warnings that might arise from making requests to 127.0.0.1
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+class TLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args: Any, **kwargs: Any) -> Any:
+        ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+        kwargs['ssl_context'] = ctx
+        return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
 
 def extract_tokens_from_uri(URL: str, locale_code: str) -> Optional[Tuple[str, str]]:
     # language
@@ -52,8 +58,12 @@ class Auth:
         local_response = self.local_response()
         # session = requests.session()
 
-        scraper = cloudscraper.create_scraper(browser='chrome')
-
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
         # prepare cookies for auth request    
         
         data = {
@@ -66,16 +76,16 @@ class Auth:
         
         headers = {'Content-Type': 'application/json', 'User-Agent': self.user_agent}
 
-        r = scraper.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
+        r = session.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
         
         cookies = {}
         cookies['cookie'] = r.cookies.get_dict()
 
         # get access token
         data = {"type": "auth", "username": username, "password": password, "remember": True}
-        r = scraper.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
+        r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
 
-        scraper.close()
+        session.close()
     
         for cookie in r.cookies.items():
             cookies['cookie'][cookie[0]] = cookie[1]
@@ -109,16 +119,21 @@ class Auth:
         # language
         local_response = self.local_response()
         
-        scraper = cloudscraper.create_scraper(browser='chrome')
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
         
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {access_token}',
             'User-Agent': self.user_agent
         }
-        r = scraper.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
+        r = session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
         
-        scraper.close()
+        session.close()
         try:
             entitlements_token = r.json()['entitlements_token']
         except KeyError:
@@ -130,7 +145,13 @@ class Auth:
 
         # language
         local_response = self.local_response()
-        scraper = cloudscraper.create_scraper(browser='chrome')
+
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
                 
         headers = {
             'Content-Type': 'application/json',
@@ -138,9 +159,9 @@ class Auth:
             'User-Agent': self.user_agent
         }
 
-        r = scraper.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
+        r = session.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
         
-        scraper.close()
+        session.close()
         try:
             puuid = r.json()['sub']
             name = r.json()['acct']['game_name']
@@ -155,7 +176,12 @@ class Auth:
         # language
         local_response = self.local_response()
 
-        scraper = cloudscraper.create_scraper(browser='chrome')
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
         
         headers = {
             'Content-Type': 'application/json',
@@ -164,9 +190,9 @@ class Auth:
         }
         
         body = {"id_token": token_id}
-        r = scraper.put('https://riot-geo.pas.si.riotgames.com/pas/v1/product/valorant', headers=headers, json=body)
+        r = session.put('https://riot-geo.pas.si.riotgames.com/pas/v1/product/valorant', headers=headers, json=body)
         
-        scraper.close()
+        session.close()
         
         try:
             region = r.json()['affinities']['live']
@@ -177,7 +203,12 @@ class Auth:
             return region 
 
     def give2facode(self, twoFAcode: str, cookies: Dict) -> Dict:
-        scraper = cloudscraper.create_scraper(browser='chrome')
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
         
         # language
         local_response = self.local_response()
@@ -189,9 +220,9 @@ class Auth:
 
         data = {"type": "multifactor", "code": twoFAcode, "rememberDevice": True}
 
-        r = scraper.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers, cookies=cookies['cookie'])
+        r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers, cookies=cookies['cookie'])
         
-        scraper.close()
+        session.close()
 
         if r.json()['type'] == 'response':
             cookies = {}
@@ -215,8 +246,13 @@ class Auth:
 
         old_cookie = cookies['cookie']
 
-        scraper = cloudscraper.create_scraper(browser='chrome')
-        r = scraper.get(
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
+        r = session.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
             cookies=cookies['cookie'],
             allow_redirects=False
@@ -225,7 +261,7 @@ class Auth:
         if r.status_code != 303:
             raise RuntimeError(local_response.get('COOKIES_EXPIRED'))
 
-        scraper.close()
+        session.close()
 
         # NEW COOKIE
         cookies = {}
@@ -240,17 +276,22 @@ class Auth:
 
     def login_with_cookie(self, cookies: Dict, locale_code: str) -> Dict:
         
-        scraper = cloudscraper.create_scraper(browser='chrome')
+        session = requests.Session()
+        session.headers = OrderedDict({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "application/json, text/plain, */*"
+        })
+        session.mount('https://', TLSAdapter())
         headers = {
             'cookie': cookies
         }
-        r = scraper.get(
+        r = session.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
             headers=headers,
             allow_redirects=False
         )
 
-        scraper.close()
+        session.close()
         
         # NEW COOKIE
         cookies = {}
