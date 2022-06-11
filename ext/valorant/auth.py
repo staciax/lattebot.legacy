@@ -5,7 +5,9 @@ import urllib3
 from typing import Tuple, Dict, Optional
 
 # Third
-import requests
+# import requests
+import cloudscraper
+
 from .locale import LocaleErrorResponse
 
 # Local
@@ -48,7 +50,9 @@ class Auth:
 
         # language
         local_response = self.local_response()
-        session = requests.session()
+        # session = requests.session()
+
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
 
         # prepare cookies for auth request    
         
@@ -62,16 +66,16 @@ class Auth:
         
         headers = {'Content-Type': 'application/json', 'User-Agent': self.user_agent}
 
-        r = session.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
+        r = scraper.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
         
         cookies = {}
         cookies['cookie'] = r.cookies.get_dict()
 
         # get access token
         data = {"type": "auth", "username": username, "password": password, "remember": True}
-        r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
+        r = scraper.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
 
-        session.close()
+        scraper.close()
     
         for cookie in r.cookies.items():
             cookies['cookie'][cookie[0]] = cookie[1]
@@ -105,15 +109,15 @@ class Auth:
         # language
         local_response = self.local_response()
         
-        session = requests.session()
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
         
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {access_token}'
         }
-        r = session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
+        r = scraper.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
         
-        session.close()
+        scraper.close()
         try:
             entitlements_token = r.json()['entitlements_token']
         except KeyError:
@@ -125,16 +129,16 @@ class Auth:
 
         # language
         local_response = self.local_response()
-        session = requests.session()
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
                 
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {access_token}'
         }
 
-        r = session.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
+        r = scraper.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
         
-        session.close()
+        scraper.close()
         try:
             puuid = r.json()['sub']
             name = r.json()['acct']['game_name']
@@ -149,7 +153,7 @@ class Auth:
         # language
         local_response = self.local_response()
 
-        session = requests.session()
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
         
         headers = {
             'Content-Type': 'application/json',
@@ -157,9 +161,9 @@ class Auth:
         }
         
         body = {"id_token": token_id}
-        r = session.put('https://riot-geo.pas.si.riotgames.com/pas/v1/product/valorant', headers=headers, json=body)
+        r = scraper.put('https://riot-geo.pas.si.riotgames.com/pas/v1/product/valorant', headers=headers, json=body)
         
-        session.close()
+        scraper.close()
         
         try:
             region = r.json()['affinities']['live']
@@ -170,7 +174,7 @@ class Auth:
             return region 
 
     def give2facode(self, twoFAcode: str, cookies: Dict) -> Dict:
-        session = requests.session()
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
         
         # language
         local_response = self.local_response()
@@ -182,9 +186,9 @@ class Auth:
 
         data = {"type": "multifactor", "code": twoFAcode, "rememberDevice": True}
 
-        r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers, cookies=cookies['cookie'])
+        r = scraper.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers, cookies=cookies['cookie'])
         
-        session.close()
+        scraper.close()
 
         if r.json()['type'] == 'response':
             cookies = {}
@@ -208,8 +212,8 @@ class Auth:
 
         old_cookie = cookies['cookie']
 
-        session = requests.session()
-        r = session.get(
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        r = scraper.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
             cookies=cookies['cookie'],
             allow_redirects=False
@@ -218,7 +222,7 @@ class Auth:
         if r.status_code != 303:
             raise RuntimeError(local_response.get('COOKIES_EXPIRED'))
 
-        session.close()
+        scraper.close()
 
         # NEW COOKIE
         cookies = {}
@@ -233,17 +237,17 @@ class Auth:
 
     def login_with_cookie(self, cookies: Dict, locale_code: str) -> Dict:
         
-        session = requests.session()
+        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
         headers = {
             'cookie': cookies
         }
-        r = session.get(
+        r = scraper.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
             headers=headers,
             allow_redirects=False
         )
 
-        session.close()
+        scraper.close()
         
         # NEW COOKIE
         cookies = {}
