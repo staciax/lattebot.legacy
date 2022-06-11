@@ -113,7 +113,8 @@ class Auth:
         
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f'Bearer {access_token}',
+            'User-Agent': self.user_agent
         }
         r = scraper.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
         
@@ -133,7 +134,8 @@ class Auth:
                 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f'Bearer {access_token}',
+            'User-Agent': self.user_agent
         }
 
         r = scraper.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
@@ -157,7 +159,8 @@ class Auth:
         
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f'Bearer {access_token}',
+            'User-Agent': self.user_agent
         }
         
         body = {"id_token": token_id}
@@ -276,7 +279,7 @@ class Auth:
             region = self.get_region(access_token, token_id)
             player_name = f'{name}#{tag}' if tag is not None and tag is not None else 'no_username'
 
-            headers = {'Authorization': f'Bearer {access_token}', 'X-Riot-Entitlements-JWT': entitlements_token}
+            headers = {'Authorization': f'Bearer {access_token}', 'X-Riot-Entitlements-JWT': entitlements_token, 'User-Agent': self.user_agent}
             user_data = {'puuid': puuid, 'region': region, 'headers': headers, 'player_name': player_name}
             return user_data
 
