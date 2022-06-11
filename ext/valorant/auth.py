@@ -52,7 +52,7 @@ class Auth:
         local_response = self.local_response()
         # session = requests.session()
 
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
 
         # prepare cookies for auth request    
         
@@ -109,7 +109,7 @@ class Auth:
         # language
         local_response = self.local_response()
         
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
         
         headers = {
             'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ class Auth:
 
         # language
         local_response = self.local_response()
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
                 
         headers = {
             'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ class Auth:
         # language
         local_response = self.local_response()
 
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
         
         headers = {
             'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ class Auth:
             return region 
 
     def give2facode(self, twoFAcode: str, cookies: Dict) -> Dict:
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
         
         # language
         local_response = self.local_response()
@@ -215,7 +215,7 @@ class Auth:
 
         old_cookie = cookies['cookie']
 
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
         r = scraper.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
             cookies=cookies['cookie'],
@@ -240,7 +240,7 @@ class Auth:
 
     def login_with_cookie(self, cookies: Dict, locale_code: str) -> Dict:
         
-        scraper = cloudscraper.create_scraper(disableCloudflareV1=True)
+        scraper = cloudscraper.create_scraper(browser='chrome')
         headers = {
             'cookie': cookies
         }
