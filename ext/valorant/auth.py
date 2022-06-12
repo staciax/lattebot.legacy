@@ -7,7 +7,7 @@ from typing import Tuple, Dict, Optional, Any
 
 # import cloudscraper
 from requests.adapters import HTTPAdapter
-from collections import OrderedDict
+# from collections import OrderedDict
 
 from .locale import LocaleErrorResponse
 
@@ -59,13 +59,10 @@ class Auth:
         # session = requests.session()
 
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
+
         # prepare cookies for auth request    
-        
         data = {
             "client_id": "play-valorant-web-prod",
             "nonce": "1",
@@ -120,12 +117,9 @@ class Auth:
         local_response = self.local_response()
         
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
-        
+
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {access_token}',
@@ -147,10 +141,7 @@ class Auth:
         local_response = self.local_response()
 
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
                 
         headers = {
@@ -177,10 +168,7 @@ class Auth:
         local_response = self.local_response()
 
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
         
         headers = {
@@ -203,11 +191,9 @@ class Auth:
             return region 
 
     def give2facode(self, twoFAcode: str, cookies: Dict) -> Dict:
+        
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
         
         # language
@@ -247,10 +233,7 @@ class Auth:
         old_cookie = cookies['cookie']
 
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
         r = session.get(
             "https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&scope=account%20openid&nonce=1",
@@ -277,11 +260,9 @@ class Auth:
     def login_with_cookie(self, cookies: Dict, locale_code: str) -> Dict:
         
         session = requests.Session()
-        session.headers = OrderedDict({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "application/json, text/plain, */*"
-        })
+        session.headers = {"Accept": "application/json, text/plain, */*"}
         session.mount('https://', TLSAdapter())
+
         headers = {
             'cookie': cookies
         }
