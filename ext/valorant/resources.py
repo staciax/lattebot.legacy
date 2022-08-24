@@ -205,7 +205,8 @@ maps: dict = {
     '/Game/Maps/Canyon/Canyon': 'Fracture',
     '/Game/Maps/Port/Port': 'Icebox',
     '/Game/Maps/Triad/Triad': 'Haven',
-    '/Game/Maps/Poveglia/Range': 'The Range'
+    '/Game/Maps/Poveglia/Range': 'The Range',
+    '/Game/Maps/Pitt/Pitt': 'Pearl'
 }
 
 RANKS = {

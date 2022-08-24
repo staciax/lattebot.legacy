@@ -68,7 +68,7 @@ class Generate_Embed:
         return Generate_Embed.build_match(result)
 
     def build_match(result: Dict) -> Tuple[List[discord.Embed], List[discord.Embed]]:
-        
+
         color = result['color']
         match_score = result['match_score']
         playdate = result['playdate']

@@ -201,24 +201,24 @@ class Latte_Bot(commands.AutoShardedBot):
         self.db: asyncpg.Pool = await self.create_db_pool()
         self.vlr_db = ValorantDB(self.db, os.getenv('CRYPTOGRAPHY_KEY'))
         await self.load_cogs()
-        
+
     async def close(self) -> None:
         await self.db.close()
         await self.session.close()
 
     async def create_db_pool(self) -> asyncpg.Pool:
-        digitalocean = {
-            "user": "staciax",
-            "password": "089298",
-            "database": "postgres",
-            "host": "167.172.80.131",
-            "port": "5432",
-            "min_size": 1,
-            "max_size": 5
-        }
+        # digitalocean = {
+        #     "user": "staciax",
+        #     "password": "089298",
+        #     "database": "postgres",
+        #     "host": "167.172.80.131",
+        #     "port": "5432",
+        #     "min_size": 1,
+        #     "max_size": 5
+        # }
         localhost = {
-            "user": "postgres",
-            "password": "089298",
+            "user": "staciax",
+            "password": "SRenLYx",
             "database": "postgres",
             "host": "localhost",
             "port": "5432",
