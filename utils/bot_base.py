@@ -122,11 +122,18 @@ class Latte_Bot(commands.AutoShardedBot):
             self.add_view(LatteSupportVerifyView(self))
             self.latte_support_view = True
 
-        await self.tree.sync()
-        await self.tree.sync(guild=discord.Object(id=840379510704046151))
-        await self.tree.sync(guild=discord.Object(id=965942839563386910))
+        await self.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.listening,
+                name=self.latte_activity)
+        )
 
-        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=self.latte_activity))
+        await self.tree.sync()
+        try:
+            await self.tree.sync(guild=discord.Object(id=840379510704046151))
+            await self.tree.sync(guild=discord.Object(id=965942839563386910))
+        except:
+            pass
 
         self.log.info(
             f"\n\nLogged in as: {self.user}"
