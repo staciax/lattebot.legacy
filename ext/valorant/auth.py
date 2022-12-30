@@ -42,7 +42,7 @@ def extract_tokens(data: str) -> str:
 
 class Auth:
     def __init__(self) -> None:
-        self.user_agent = 'RiotClient/51.0.0.4429735.4381201 rso-auth (Windows;10;;Professional, x64)'
+        self.user_agent = "RiotClient/62.0.1.4852117.4789131 %s (Windows;10;;Professional, x64)"
 
         self.locale_code = 'en-US' # default language
         self.response = {} # prepare response for local response

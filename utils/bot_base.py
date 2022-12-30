@@ -224,13 +224,13 @@ class Latte_Bot(commands.AutoShardedBot):
         #     "max_size": 5
         # }
         localhost = {
-            "user": "staciax",
-            "password": "SRenLYx",
-            "database": "stacia_dev",
+            "user": "postgres",
+            "password": "4869",
+            "database": "postgres",
             "host": "localhost",
             "port": "5432",
             "max_size": 20,
-            "min_size": 20,
+            "min_size": 20
         }
         db = None
         try:
